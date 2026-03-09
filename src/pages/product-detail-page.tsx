@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
+import { Check, Settings2, ChevronDown } from "lucide-react"
 import { products } from "@/data/products"
 import { Card } from "@/components/ui/card"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { QuantitySelector } from "@/components/common/quantity-selector"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
@@ -23,19 +23,56 @@ export function ProductDetailPage() {
       name: "Samantha D.",
       rating: 4.5,
       date: "August 14, 2023",
-      title: "My new go-to tee",
       content:
-        "I absolutely love this t-shirt! The design is unique and the fabric feels so comfortable. As a fellow designer, I appreciate the attention to detail.",
+        "I absolutely love this t-shirt! The design is unique and the fabric feels so comfortable. As a fellow designer, I appreciate the attention to detail. It's become my favorite go-to shirt.",
     },
     {
       name: "Alex M.",
-      rating: 5,
+      rating: 4,
       date: "August 15, 2023",
-      title: "Exceeded my expectations",
       content:
-        "The colors are vibrant and the print quality is top-notch. I'm quite picky about fit, and this definitely gets a thumbs up from me.",
+        "The t-shirt exceeded my expectations! The colors are vibrant and the print quality is top-notch. Being a UX/UI designer myself, I'm quite picky about aesthetics, and this t-shirt definitely gets a thumbs up from me.",
+    },
+    {
+      name: "Ethan R.",
+      rating: 3.5,
+      date: "August 16, 2023",
+      content:
+        "This t-shirt is a must-have for anyone who appreciates good design. The minimalistic yet stylish pattern caught my eye, and the fit is perfect. I can see the designer's touch in every aspect of this shirt.",
+    },
+    {
+      name: "Olivia P.",
+      rating: 4.5,
+      date: "August 17, 2023",
+      content:
+        "As a UI/UX enthusiast, I value simplicity and functionality. This t-shirt not only represents those principles but also feels great to wear. It's evident that the designer poured their creativity into making this t-shirt stand out.",
+    },
+    {
+      name: "Liam K.",
+      rating: 4,
+      date: "August 18, 2023",
+      content:
+        "This t-shirt is a fusion of comfort and creativity. The fabric is soft, and the design speaks volumes about the designer's skill. It's like wearing a piece of art that reflects my passion for both design and fashion.",
+    },
+    {
+      name: "Ava H.",
+      rating: 4.5,
+      date: "August 19, 2023",
+      content:
+        "I'm not just wearing a t-shirt; I'm wearing a piece of design philosophy. The intricate details and thoughtful layout of the design make this shirt a conversation starter.",
     },
   ]
+
+  function getStars(rating: number) {
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+    const array = Array(5).fill(0);
+    return array.map((_, i) => {
+      if (i < fullStars) return "★";
+      if (i === fullStars && halfStar) return "★"; // or a half star symbol if available
+      return "☆";
+    }).join("");
+  }
 
   const recommendations = useMemo(
     () =>
@@ -84,24 +121,24 @@ export function ProductDetailPage() {
         />
       </section>
 
-      <section className="space-y-6">
+      <section className="space-y-6 pt-10">
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="w-full justify-start gap-10 rounded-none border-b bg-transparent px-0 pb-0">
+          <TabsList className="flex w-full items-center justify-between gap-0 rounded-none border-b border-zinc-200 bg-transparent px-0 pb-0 md:justify-around">
             <TabsTrigger
               value="details"
-              className="rounded-none border-b-2 border-transparent px-0 pb-3 text-sm font-medium text-zinc-500 data-[state=active]:border-zinc-900 data-[state=active]:text-zinc-900"
+              className="flex-1 rounded-none border-b-2 border-transparent px-0 pb-4 font-satoshi text-base font-normal text-zinc-500 hover:text-zinc-900 data-[state=active]:border-black data-[state=active]:font-medium data-[state=active]:text-black"
             >
               Product Details
             </TabsTrigger>
             <TabsTrigger
               value="reviews"
-              className="rounded-none border-b-2 border-transparent px-0 pb-3 text-sm font-medium text-zinc-500 data-[state=active]:border-zinc-900 data-[state=active]:text-zinc-900"
+              className="flex-1 rounded-none border-b-2 border-transparent px-0 pb-4 font-satoshi text-base font-normal text-zinc-500 hover:text-zinc-900 data-[state=active]:border-black data-[state=active]:font-medium data-[state=active]:text-black"
             >
               Rating &amp; Reviews
             </TabsTrigger>
             <TabsTrigger
               value="faqs"
-              className="rounded-none border-b-2 border-transparent px-0 pb-3 text-sm font-medium text-zinc-500 data-[state=active]:border-zinc-900 data-[state=active]:text-zinc-900"
+              className="flex-1 rounded-none border-b-2 border-transparent px-0 pb-4 font-satoshi text-base font-normal text-zinc-500 hover:text-zinc-900 data-[state=active]:border-black data-[state=active]:font-medium data-[state=active]:text-black"
             >
               FAQs
             </TabsTrigger>
@@ -131,76 +168,109 @@ export function ProductDetailPage() {
             </div>
           </TabsContent>
           <TabsContent value="reviews" activeValue={tab}>
-            <div className="space-y-6 pt-6">
+            <div className="space-y-8 pt-8 font-satoshi">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-zinc-500">
-                    Rating
-                  </p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-semibold text-zinc-900">
-                      {product.rating.toFixed(1)}
-                    </span>
-                    <span className="text-xs text-zinc-500">
-                      ({product.reviews} reviews)
-                    </span>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-black md:text-2xl">
+                    All Reviews
+                  </h2>
+                  <span className="text-sm text-zinc-500">
+                    (451)
+                  </span>
                 </div>
-                <Button
-                  variant="outline"
-                  className="rounded-full border-zinc-300 px-5 text-xs font-medium"
-                >
-                  Write a Review
-                </Button>
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="secondary"
+                    className="flex h-12 w-12 items-center justify-center rounded-full bg-[#F0F0F0] p-0 hover:bg-zinc-200"
+                  >
+                    <Settings2 className="h-5 w-5 text-black" />
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="hidden h-12 items-center gap-4 rounded-full bg-[#F0F0F0] px-5 text-base font-medium text-black hover:bg-zinc-200 md:flex"
+                  >
+                    Latest <ChevronDown className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    className="h-12 rounded-full bg-black px-6 text-base font-medium text-white hover:bg-zinc-800"
+                  >
+                    Write a Review
+                  </Button>
+                </div>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-5 md:grid-cols-2">
                 {mockReviews.map((review) => (
                   <Card
                     key={review.name}
-                    className="space-y-3 rounded-2xl border-zinc-100 p-5 shadow-sm"
+                    className="flex shrink-0 flex-col justify-between rounded-[20px] border border-black/10 bg-white px-8 py-7 text-base text-black/80 shadow-none"
                   >
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold text-zinc-900">
-                          {review.name}
-                        </p>
-                        <p className="text-xs text-zinc-500">
-                          Posted on {review.date}
-                        </p>
+                    <div className="mb-4 flex gap-3 flex-col">
+                      <div className="flex items-center justify-between">
+                        <div className="text-xl text-[#FDB241] tracking-widest">
+                          {getStars(review.rating)}
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-black">
+                          <span className="sr-only">More options</span>
+                          <span className="text-xl leading-none">...</span>
+                        </Button>
                       </div>
-                      <div className="text-sm font-medium text-zinc-900">
-                        ★★★★☆
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl font-bold leading-5 text-black">
+                          {review.name}
+                        </span>
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#01AB31]">
+                          <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                        </span>
                       </div>
                     </div>
-                    <p className="text-sm font-medium text-zinc-900">
-                      {review.title}
+                    <p className="text-base leading-6 text-black/60">
+                      &ldquo;{review.content}&rdquo;
                     </p>
-                    <p className="text-sm text-zinc-600">{review.content}</p>
+                    <p className="mt-6 text-sm font-medium text-black/60">
+                      Posted on {review.date}
+                    </p>
                   </Card>
                 ))}
+              </div>
+
+              <div className="flex items-center justify-center pt-4">
+                <Button
+                  variant="outline"
+                  className="h-12 rounded-full border-black/10 px-8 font-satoshi text-base font-medium text-black hover:bg-black hover:text-white"
+                >
+                  Load More Reviews
+                </Button>
               </div>
             </div>
           </TabsContent>
           <TabsContent value="faqs" activeValue={tab}>
-            <div className="space-y-4 pt-6 text-sm text-zinc-600">
-              <div className="rounded-2xl border border-zinc-100 bg-zinc-50 p-5">
-                <h3 className="text-sm font-semibold text-zinc-900">
+            <div className="space-y-4 pt-8 font-satoshi text-base text-zinc-600">
+              <div className="rounded-[20px] border border-black/10 bg-white p-6 shadow-none">
+                <h3 className="text-xl font-bold text-black">
                   What is the return policy?
                 </h3>
-                <p className="mt-1">
+                <p className="mt-2 text-black/60">
                   You can return unworn items within 30 days of delivery for a
                   full refund. Tags must be attached and original packaging
                   included.
                 </p>
               </div>
-              <div className="rounded-2xl border border-zinc-100 bg-zinc-50 p-5">
-                <h3 className="text-sm font-semibold text-zinc-900">
+              <div className="rounded-[20px] border border-black/10 bg-white p-6 shadow-none">
+                <h3 className="text-xl font-bold text-black">
                   How long does shipping take?
                 </h3>
-                <p className="mt-1">
+                <p className="mt-2 text-black/60">
                   Standard shipping typically takes 3–5 business days. Express
                   options are available at checkout.
+                </p>
+              </div>
+              <div className="rounded-[20px] border border-black/10 bg-white p-6 shadow-none">
+                <h3 className="text-xl font-bold text-black">
+                  How do I find my fit?
+                </h3>
+                <p className="mt-2 text-black/60">
+                  Our fits are generally relaxed/oversized. We recommend sticking to your regular size for an intended loose fit, or sizing down if you prefer a more tailored look. Check the Size & Fit tab for specific dimensions.
                 </p>
               </div>
             </div>
@@ -290,71 +360,83 @@ function ProductInfo({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 md:text-3xl">
+        <h1 className="font-integral text-3xl font-black uppercase tracking-tighter text-zinc-900 md:text-4xl">
           {name}
         </h1>
-        <p className="mt-2 flex items-center gap-2 text-sm text-zinc-600">
+        <p className="mt-2 flex items-center gap-2 font-satoshi text-sm text-zinc-600">
           <span className="text-yellow-500">★★★★☆</span>
           <span className="font-medium">{rating.toFixed(1)}/5</span>
           <span className="text-zinc-400">({reviews} reviews)</span>
         </p>
       </div>
 
-      <div className="flex items-end gap-3">
-        <span className="text-2xl font-black text-zinc-900">${price}</span>
+      <div className="flex items-end gap-3 font-satoshi">
+        <span className="text-3xl font-bold text-zinc-900">${price}</span>
         {originalPrice && (
-          <span className="text-sm text-zinc-400 line-through">
+          <span className="text-xl font-bold text-zinc-400 line-through">
             ${originalPrice}
           </span>
         )}
       </div>
 
-      <div className="space-y-3 text-sm">
-        <div>
-          <div className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
-            Color
+      <p className="font-satoshi text-sm text-zinc-500">
+        This graphic t-shirt is perfect for any occasion. Crafted from a soft and breathable fabric, it offers superior comfort and style.
+      </p>
+
+      <hr className="border-zinc-200" />
+
+      <div className="space-y-6">
+        <div className="space-y-4">
+          <div className="font-satoshi text-base text-[#000000] opacity-60">
+            Select Colors
           </div>
-          <ToggleGroup
-            type="single"
-            value={color}
-            onValueChange={(v) => onColorChange(String(v))}
-          >
+          <div className="flex items-center justify-start gap-3">
             {colors.map((c) => (
-              <ToggleGroupItem
+              <button
                 key={c}
-                value={c}
-                className="h-8 w-8 rounded-full border border-zinc-200 p-0"
+                type="button"
+                onClick={() => onColorChange(c)}
+                aria-label={`Color ${c}`}
+                className="flex h-10 w-10 items-center justify-center rounded-full border-none p-0 overflow-hidden ring-offset-white focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2"
+                style={{ backgroundColor: c }}
               >
-                <span
-                  className="block h-6 w-6 rounded-full"
-                  style={{ backgroundColor: c }}
-                />
-              </ToggleGroupItem>
+                {color === c && (
+                  <Check className="h-4 w-4 text-white mix-blend-difference drop-shadow-md" strokeWidth={3} />
+                )}
+              </button>
             ))}
-          </ToggleGroup>
-        </div>
-
-        <div>
-          <div className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
-            Size
           </div>
-          <ToggleGroup
-            type="single"
-            value={size}
-            onValueChange={(v) => onSizeChange(String(v))}
-          >
-            {sizes.map((s) => (
-              <ToggleGroupItem key={s} value={s}>
-                {s}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
         </div>
 
-        <div className="flex items-center gap-4 pt-2">
+        <hr className="border-zinc-200" />
+
+        <div className="space-y-4">
+          <div className="font-satoshi text-base text-[#000000] opacity-60">
+            Choose Size
+          </div>
+          <div className="flex flex-wrap items-center justify-start gap-3">
+            {sizes.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => onSizeChange(s)}
+                className={`flex h-[46px] items-center justify-center rounded-full px-6 font-satoshi text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 ring-offset-white ${size === s
+                    ? "bg-black text-white"
+                    : "bg-[#F0F0F0] text-black/60 hover:bg-zinc-200 hover:text-black"
+                  }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <hr className="border-zinc-200" />
+
+        <div className="flex items-center gap-4 pt-4">
           <QuantitySelector value={quantity} onChange={onQuantityChange} />
           <Button
-            className="flex-1 rounded-full bg-black text-xs font-semibold uppercase tracking-[0.18em] text-white hover:bg-zinc-900"
+            className="h-14 flex-1 rounded-full bg-black font-satoshi text-base font-medium text-white hover:bg-zinc-800"
             onClick={onAddToCart}
           >
             Add to Cart

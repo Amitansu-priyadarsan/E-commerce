@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+
 
 type QuantitySelectorProps = {
   value: number
@@ -17,30 +17,26 @@ export function QuantitySelector({
   const inc = () => onChange(Math.min(max, value + 1))
 
   return (
-    <div className="inline-flex items-center rounded-full bg-[#F0F0F0] p-1">
-      <Button
+    <div className="inline-flex h-14 w-32 items-center justify-between rounded-full bg-[#F0F0F0] px-3">
+      <button
         type="button"
-        size="icon-xs"
-        variant="ghost"
-        className="rounded-full"
+        className="flex h-10 w-10 items-center justify-center text-xl font-medium text-zinc-900 focus:outline-none disabled:opacity-50"
         onClick={dec}
         disabled={value <= min}
       >
         -
-      </Button>
-      <span className="w-8 text-center text-xs font-semibold text-zinc-900">
+      </button>
+      <span className="font-satoshi text-base font-medium text-zinc-900">
         {value}
       </span>
-      <Button
+      <button
         type="button"
-        size="icon-xs"
-        variant="ghost"
-        className="rounded-full"
+        className="flex h-10 w-10 items-center justify-center text-xl font-medium text-zinc-900 focus:outline-none disabled:opacity-50"
         onClick={inc}
         disabled={value >= max}
       >
         +
-      </Button>
+      </button>
     </div>
   )
 }
