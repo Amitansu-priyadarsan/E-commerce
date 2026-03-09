@@ -18,11 +18,13 @@ export function HomePage() {
         subtitle="Fresh silhouettes and fabrics, just dropped."
         products={newArrivals}
       />
+      <div className="mx-auto w-full max-w-[1440px] border-b border-black/10" />
       <ProductSection
         title="Top Selling"
         subtitle="The pieces everyone keeps coming back for."
         products={topSelling}
       />
+      {/* Divider between New Arrivals and Top Selling */}
       <StyleMosaic />
       <ReviewCarousel />
     </div>

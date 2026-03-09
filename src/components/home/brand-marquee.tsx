@@ -2,16 +2,19 @@ const brands = ["Versace", "Zara", "Gucci", "Prada", "Calvin Klein"]
 
 export function BrandMarquee() {
   return (
-    <section className="mt-8 rounded-3xl bg-black px-4 py-4 text-white">
-      <div className="flex flex-wrap items-center justify-center gap-8 text-xs font-semibold uppercase tracking-[0.25em] opacity-80">
-        {brands.map((brand) => (
-          <div
-            key={brand}
-            className="flex items-center justify-center rounded-full border border-white/10 px-6 py-2"
-          >
-            {brand}
-          </div>
-        ))}
+    // Full-bleed black strip (ignores page horizontal padding)
+    <section className="mt-8 w-screen relative left-1/2 right-1/2 -mx-[50vw]">
+      <div className="flex h-[122px] w-full items-center justify-center bg-black">
+        <div className="flex items-center justify-center gap-24">
+          {brands.map((brand) => (
+            <span
+              key={brand}
+              className="font-serif text-[20px] font-semibold tracking-[0.5em] text-white uppercase"
+            >
+              {brand}
+            </span>
+          ))}
+        </div>
       </div>
     </section>
   )
