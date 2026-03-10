@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ArrowRight } from "lucide-react"
+import { ReviewCard } from "@/components/common/review-card"
 
 type Review = {
   id: number
@@ -47,10 +47,6 @@ const reviews: Review[] = [
     rating: 5,
   },
 ]
-
-function getStars(rating: number) {
-  return "★★★★★".slice(0, rating)
-}
 
 export function ReviewCarousel() {
   const trackRef = useRef<HTMLDivElement | null>(null)
@@ -123,27 +119,14 @@ export function ReviewCarousel() {
           className="no-scrollbar flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-2"
         >
           {reviews.map((review) => (
-            <Card
+            <ReviewCard
               key={review.id}
-              className="flex w-96 shrink-0 flex-col justify-between rounded-[20px] border border-black/10 bg-white px-8 py-7 text-base text-black/80 snap-start"
-            >
-              <div className="mb-4 flex flex-col gap-3">
-                <div className="text-base text-[#FDB241]">
-                  {getStars(review.rating)}
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xl font-bold leading-5 text-black">
-                    {review.name}
-                  </span>
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#01AB31]">
-                    <span className="sr-only">Verified buyer</span>
-                  </span>
-                </div>
-              </div>
-              <p className="text-base leading-5 text-black/60">
-                “{review.content}”
-              </p>
-            </Card>
+              name={review.name}
+              rating={review.rating}
+              content={review.content}
+              verified
+              className="w-96 snap-start"
+            />
           ))}
         </div>
 

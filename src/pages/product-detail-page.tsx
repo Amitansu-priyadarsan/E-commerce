@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
 import { Check, Settings2, ChevronDown } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { products } from "@/data/products"
 import { Card } from "@/components/ui/card"
 import { QuantitySelector } from "@/components/common/quantity-selector"
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { ProductSection } from "@/components/home/product-section"
 import { useCart } from "@/contexts/cart-context"
+import { ReviewCard } from "@/components/common/review-card"
 
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -63,17 +65,6 @@ export function ProductDetailPage() {
     },
   ]
 
-  function getStars(rating: number) {
-    const fullStars = Math.floor(rating);
-    const halfStar = rating % 1 >= 0.5 ? 1 : 0;
-    const array = Array(5).fill(0);
-    return array.map((_, i) => {
-      if (i < fullStars) return "★";
-      if (i === fullStars && halfStar) return "★"; // or a half star symbol if available
-      return "☆";
-    }).join("");
-  }
-
   const recommendations = useMemo(
     () =>
       products
@@ -100,7 +91,7 @@ export function ProductDetailPage() {
   }
 
   return (
-    <div className="space-y-10 py-6">
+    <div className="space-y-10 py-6 pb-16">
       <section className="grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         <ImageGallery image={product.image} />
         <ProductInfo
@@ -123,27 +114,40 @@ export function ProductDetailPage() {
 
       <section className="space-y-6 pt-10">
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="flex w-full items-center justify-between gap-0 rounded-none border-b border-zinc-200 bg-transparent px-0 pb-0 md:justify-around">
-            <TabsTrigger
-              value="details"
-              className="flex-1 rounded-none border-b-2 border-transparent px-0 pb-4 font-satoshi text-base font-normal text-zinc-500 hover:text-zinc-900 data-[state=active]:border-black data-[state=active]:font-medium data-[state=active]:text-black"
-            >
-              Product Details
-            </TabsTrigger>
-            <TabsTrigger
-              value="reviews"
-              className="flex-1 rounded-none border-b-2 border-transparent px-0 pb-4 font-satoshi text-base font-normal text-zinc-500 hover:text-zinc-900 data-[state=active]:border-black data-[state=active]:font-medium data-[state=active]:text-black"
-            >
-              Rating &amp; Reviews
-            </TabsTrigger>
-            <TabsTrigger
-              value="faqs"
-              className="flex-1 rounded-none border-b-2 border-transparent px-0 pb-4 font-satoshi text-base font-normal text-zinc-500 hover:text-zinc-900 data-[state=active]:border-black data-[state=active]:font-medium data-[state=active]:text-black"
-            >
-              FAQs
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="details" activeValue={tab}>
+          <div className=" pb-0">
+            <TabsList className="flex w-full items-center justify-between gap-0 rounded-none border-transparent bg-transparent p-0 md:justify-around">
+              <TabsTrigger
+                value="details"
+                className={cn(
+                  "flex-1 rounded-none border-b-2 border-transparent bg-transparent px-0 pb-4 pt-0 font-satoshi text-base font-normal text-zinc-500 hover:bg-transparent hover:text-zinc-900",
+                  tab === "details" &&
+                    "border-black font-medium text-black"
+                )}
+              >
+                Product Details
+              </TabsTrigger>
+              <TabsTrigger
+                value="reviews"
+                className={cn(
+                  "flex-1 rounded-none border-b-2 border-transparent bg-transparent px-0 pb-4 pt-0 font-satoshi text-base font-normal text-zinc-500 hover:bg-transparent hover:text-zinc-900",
+                  tab === "reviews" &&
+                    "border-black font-medium text-black"
+                )}
+              >
+                Rating &amp; Reviews
+              </TabsTrigger>
+              <TabsTrigger
+                value="faqs"
+                className={cn(
+                  "flex-1 rounded-none border-b-2 border-transparent bg-transparent px-0 pb-4 pt-0 font-satoshi text-base font-normal text-zinc-500 hover:bg-transparent hover:text-zinc-900",
+                  tab === "faqs" && "border-black font-medium text-black"
+                )}
+              >
+                FAQs
+              </TabsTrigger>
+            </TabsList>
+          </div>
+          <TabsContent value="details">
             <div className="grid gap-6 pt-6 md:grid-cols-2">
               <div className="space-y-3 text-sm text-zinc-600">
                 <p>
@@ -167,7 +171,7 @@ export function ProductDetailPage() {
               </div>
             </div>
           </TabsContent>
-          <TabsContent value="reviews" activeValue={tab}>
+          <TabsContent value="reviews" >
             <div className="space-y-8 pt-8 font-satoshi">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-2">
@@ -201,36 +205,15 @@ export function ProductDetailPage() {
 
               <div className="grid gap-5 md:grid-cols-2">
                 {mockReviews.map((review) => (
-                  <Card
+                  <ReviewCard
                     key={review.name}
-                    className="flex shrink-0 flex-col justify-between rounded-[20px] border border-black/10 bg-white px-8 py-7 text-base text-black/80 shadow-none"
-                  >
-                    <div className="mb-4 flex gap-3 flex-col">
-                      <div className="flex items-center justify-between">
-                        <div className="text-xl text-[#FDB241] tracking-widest">
-                          {getStars(review.rating)}
-                        </div>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-black">
-                          <span className="sr-only">More options</span>
-                          <span className="text-xl leading-none">...</span>
-                        </Button>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl font-bold leading-5 text-black">
-                          {review.name}
-                        </span>
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#01AB31]">
-                          <Check className="h-3 w-3 text-white" strokeWidth={3} />
-                        </span>
-                      </div>
-                    </div>
-                    <p className="text-base leading-6 text-black/60">
-                      &ldquo;{review.content}&rdquo;
-                    </p>
-                    <p className="mt-6 text-sm font-medium text-black/60">
-                      Posted on {review.date}
-                    </p>
-                  </Card>
+                    name={review.name}
+                    rating={review.rating}
+                    content={review.content}
+                    date={review.date}
+                    verified
+                    showMenu
+                  />
                 ))}
               </div>
 
@@ -244,7 +227,7 @@ export function ProductDetailPage() {
               </div>
             </div>
           </TabsContent>
-          <TabsContent value="faqs" activeValue={tab}>
+          <TabsContent value="faqs" >
             <div className="space-y-4 pt-8 font-satoshi text-base text-zinc-600">
               <div className="rounded-[20px] border border-black/10 bg-white p-6 shadow-none">
                 <h3 className="text-xl font-bold text-black">

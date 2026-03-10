@@ -3,7 +3,7 @@ import { Instagram, Twitter, Facebook, Youtube } from "lucide-react"
 
 export function Footer() {
   return (
-    <footer className="mt-0 bg-[#F0F0F0] pb-10 pt-4">
+    <footer className="-mt-36 bg-[#F0F0F0] pb-10 pt-20 md:-mt-42 md:pt-24">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pt-8 lg:flex-row lg:gap-12 lg:px-0">
         <div className="space-y-4 lg:w-1/3">
           <div className="text-xl font-black tracking-[0.2em]">SHOP.CO</div>

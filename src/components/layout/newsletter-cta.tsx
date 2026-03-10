@@ -3,31 +3,29 @@ import { Button } from "@/components/ui/button"
 
 export function NewsletterCta() {
   return (
-    <section className="-translate-y-1/2 rounded-3xl bg-black px-6 py-8 text-white shadow-xl lg:px-10 lg:py-10">
-      <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
-        <div>
-          <h2 className="text-2xl font-black uppercase tracking-[0.25em]">
-            Stay in the loop
+    <section className="-translate-y-1/2 rounded-3xl bg-black px-4 py-6 text-white shadow-xl sm:px-6 lg:px-10 lg:py-9">
+      <div className="mx-auto flex max-w-[1240px] flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+        <div className="max-w-xl md:max-w-[551px]">
+          <h2 className="font-integral text-2xl font-bold leading-snug md:text-4xl md:leading-10">
+            STAY UPTO DATE ABOUT OUR LATEST OFFERS
           </h2>
-          <p className="mt-2 max-w-md text-sm text-zinc-300">
-            Get early access to new drops, exclusive discounts, and style tips
-            straight to your inbox.
-          </p>
         </div>
         <form
-          className="flex w-full flex-col gap-3 md:w-80"
+          className="flex w-full flex-col gap-3.5 md:w-[380px]"
           onSubmit={(e) => e.preventDefault()}
         >
-          <Input
-            type="email"
-            placeholder="Enter your email"
-            className="bg-white/5 text-sm text-white placeholder:text-zinc-400"
-          />
+         <div className="flex w-full items-center rounded-[62px] bg-white px-4 py-3">
+  <Input
+    type="email"
+    placeholder="Enter your email address"
+    className="flex-1 min-w-0 h-auto border-none bg-transparent p-0 text-base font-normal text-black placeholder:text-black/40 focus-visible:ring-0 focus-visible:ring-offset-0"
+  />
+</div>
           <Button
             type="submit"
-            className="w-full rounded-full bg-white text-xs font-semibold uppercase tracking-[0.18em] text-black hover:bg-zinc-200"
+            className="w-full rounded-[62px] bg-white px-4 py-3 text-base font-medium text-black hover:bg-zinc-200"
           >
-            Join Newsletter
+            Subscribe to Newsletter
           </Button>
         </form>
       </div>
