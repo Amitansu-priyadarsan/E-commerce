@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import type { ReactNode } from "react"
 import { AnnouncementBar } from "./announcement-bar"
 import { Navbar } from "./navbar"
 import { NewsletterCta } from "./newsletter-cta"
