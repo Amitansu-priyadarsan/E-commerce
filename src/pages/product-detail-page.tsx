@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, useLocation } from "react-router-dom"
 import { Check, Settings2, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { products } from "@/data/products"
+import { products, type Product } from "@/data/products"
 import { Card } from "@/components/ui/card"
 import { QuantitySelector } from "@/components/common/quantity-selector"
 import { Button } from "@/components/ui/button"
@@ -13,7 +13,9 @@ import { ReviewCard } from "@/components/common/review-card"
 
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>()
-  const product = products.find((p) => p.id === id)
+  const location = useLocation()
+  const stateProduct = location.state?.product as Product | undefined
+  const product = stateProduct || products.find((p) => p.id === id)
   const { addItem } = useCart()
   const [color, setColor] = useState<string | undefined>(product?.colors[0])
   const [size, setSize] = useState<string | undefined>(product?.sizes[0])
@@ -121,7 +123,7 @@ export function ProductDetailPage() {
                 className={cn(
                   "flex-1 rounded-none border-b-2 border-transparent bg-transparent px-0 pb-4 pt-0 font-satoshi text-base font-normal text-zinc-500 hover:bg-transparent hover:text-zinc-900",
                   tab === "details" &&
-                    "border-black font-medium text-black"
+                  "border-black font-medium text-black"
                 )}
               >
                 Product Details
@@ -131,7 +133,7 @@ export function ProductDetailPage() {
                 className={cn(
                   "flex-1 rounded-none border-b-2 border-transparent bg-transparent px-0 pb-4 pt-0 font-satoshi text-base font-normal text-zinc-500 hover:bg-transparent hover:text-zinc-900",
                   tab === "reviews" &&
-                    "border-black font-medium text-black"
+                  "border-black font-medium text-black"
                 )}
               >
                 Rating &amp; Reviews
@@ -404,8 +406,8 @@ function ProductInfo({
                 type="button"
                 onClick={() => onSizeChange(s)}
                 className={`flex h-[46px] items-center justify-center rounded-full px-6 font-satoshi text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 ring-offset-white ${size === s
-                    ? "bg-black text-white"
-                    : "bg-[#F0F0F0] text-black/60 hover:bg-zinc-200 hover:text-black"
+                  ? "bg-black text-white"
+                  : "bg-[#F0F0F0] text-black/60 hover:bg-zinc-200 hover:text-black"
                   }`}
               >
                 {s}
