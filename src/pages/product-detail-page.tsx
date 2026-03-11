@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { useParams, useLocation } from "react-router-dom"
 import { Check, Settings2, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -7,7 +7,6 @@ import { Card } from "@/components/ui/card"
 import { QuantitySelector } from "@/components/common/quantity-selector"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { ProductSection } from "@/components/home/product-section"
 import { useCart } from "@/contexts/cart-context"
 import { ReviewCard } from "@/components/common/review-card"
 
@@ -66,14 +65,6 @@ export function ProductDetailPage() {
         "I'm not just wearing a t-shirt; I'm wearing a piece of design philosophy. The intricate details and thoughtful layout of the design make this shirt a conversation starter.",
     },
   ]
-
-  const recommendations = useMemo(
-    () =>
-      products
-        .filter((p) => p.id !== product?.id && p.category === product?.category)
-        .slice(0, 4),
-    [product]
-  )
 
   if (!product) {
     return <div className="py-10 text-sm text-zinc-700">Product not found.</div>
@@ -262,13 +253,6 @@ export function ProductDetailPage() {
           </TabsContent>
         </Tabs>
       </section>
-
-      {recommendations.length > 0 && (
-        <ProductSection
-          title="You Might Also Like"
-          products={recommendations}
-        />
-      )}
     </div>
   )
 }
