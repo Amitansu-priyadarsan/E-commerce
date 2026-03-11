@@ -5,6 +5,9 @@ import { HomePage } from "@/pages/home-page"
 import { CategoryPage } from "@/pages/category-page"
 import { ProductDetailPage } from "@/pages/product-detail-page"
 import { CartPage } from "@/pages/cart-page"
+import { ProfilePage } from "@/pages/profile-page"
+import { WishlistPage } from "@/pages/wishlist-page"
+import { ContactUsPage } from "@/pages/contact-us-page"
 
 function ScrollToTopOnRouteChange() {
   const { pathname } = useLocation()
@@ -27,6 +30,9 @@ function App() {
         <Route path="/category/:slug" element={<CategoryPage />} />
         <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/wishlist" element={<WishlistPage />} />
+        <Route path="/contact-us" element={<ContactUsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

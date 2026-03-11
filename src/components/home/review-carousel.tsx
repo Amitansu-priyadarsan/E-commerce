@@ -1,157 +1,121 @@
-import { useEffect, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft, ArrowRight } from "lucide-react"
-import { ReviewCard } from "@/components/common/review-card"
+import { User } from "lucide-react"
+import { GoogleLogo } from "@/components/icons/google-logo"
+import { StarFilled } from "@/components/icons/star-filled"
+import { StarUnfilled } from "@/components/icons/star-unfilled"
+import { GoogleGIcon } from "@/components/icons/google-g-icon"
 
 type Review = {
   id: number
   name: string
   content: string
   rating: number
+  date: string
 }
 
 const reviews: Review[] = [
   {
     id: 1,
-    name: "Sarah M.",
-    content:
-      "I’m blown away by the quality and style of the clothes I received from Shop.co. From casual wear to elegant dresses, every piece I’ve bought has exceeded my expectations.",
-    rating: 5,
+    name: "Swati Singh",
+    date: "2023-07-16",
+    content: "I have shopped a lot recently this store.\ni think its quit decent.",
+    rating: 4,
   },
   {
     id: 2,
-    name: "Alex K.",
-    content:
-      "Finding clothes that align with my personal style used to be a challenge until I discovered Shop.co. The range of options they offer is truly remarkable, catering to a variety of tastes and occasions.",
+    name: "Manisha Shrivastava",
+    date: "2023-07-16",
+    content: "I have shopped a lot recently this store.\ni think its quit decent.",
     rating: 5,
   },
   {
     id: 3,
-    name: "James L.",
-    content:
-      "As someone who’s always on the lookout for unique fashion pieces, I’m thrilled to have stumbled upon Shop.co. The selection of clothes is not only diverse but also on‑point with the latest trends.",
+    name: "Swati Singh",
+    date: "2023-07-16",
+    content: "I have shopped a lot recently this store.\ni think its quit decent.",
     rating: 4,
   },
   {
     id: 4,
-    name: "Mia R.",
-    content:
-      "The fit and comfort of their pieces are unmatched. I’ve recommended Shop.co to all my friends and they love it just as much as I do.",
+    name: "Manisha Shrivastava",
+    date: "2023-07-16",
+    content: "I have shopped a lot recently this store.\ni think its quit decent.",
     rating: 5,
   },
   {
     id: 5,
-    name: "Daniel H.",
-    content:
-      "From the moment I placed my order to the unboxing experience, everything felt premium. This is my new go‑to store.",
-    rating: 5,
+    name: "Swati Singh",
+    date: "2023-07-16",
+    content: "I have shopped a lot recently this store.\ni think its quit decent.",
+    rating: 4,
   },
 ]
 
-export function ReviewCarousel() {
-  const trackRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    const track = trackRef.current
-    if (!track) return
-
-    const interval = window.setInterval(() => {
-      if (!track) return
-      const { scrollLeft, scrollWidth, clientWidth } = track
-      const maxScroll = scrollWidth - clientWidth
-
-      // If we're near the end, jump back to start
-      if (scrollLeft + clientWidth >= maxScroll - 16) {
-        track.scrollTo({ left: 0, behavior: "smooth" })
-      } else {
-        track.scrollBy({ left: clientWidth * 0.7, behavior: "smooth" })
-      }
-    }, 4500)
-
-    return () => window.clearInterval(interval)
-  }, [])
-
-  const handleScroll = (direction: "prev" | "next") => {
-    const track = trackRef.current
-    if (!track) return
-    const { clientWidth } = track
-    const offset = clientWidth * 0.7
-
-    track.scrollBy({
-      left: direction === "next" ? offset : -offset,
-      behavior: "smooth",
-    })
-  }
-
+function GoogleReviewCard({ review }: { review: Review }) {
   return (
-    <section className="mt-16 space-y-6 overflow-x-hidden">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="text-2xl font-black uppercase tracking-tight text-black md:text-4xl">
-          OUR HAPPY CUSTOMERS
-        </h2>
-        <div className="hidden items-center gap-2 md:flex">
-          <Button
-            type="button"
-            aria-label="Previous review"
-            variant="outline"
-            size="icon"
-            className="h-10 w-10 rounded-full border-black/10 text-lg text-black hover:bg-black hover:text-white"
-            onClick={() => handleScroll("prev")}
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <Button
-            type="button"
-            aria-label="Next review"
-            variant="outline"
-            size="icon"
-            className="h-10 w-10 rounded-full border-black/10 text-lg text-black hover:bg-black hover:text-white"
-            onClick={() => handleScroll("next")}
-          >
-            <ArrowRight className="h-5 w-5" />
-          </Button>
+    <div className="relative w-[340px] shrink-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)] mb-4 h-full">
+      <div className="rounded-[12px] border border-gray-200 bg-white p-6 relative z-10 flex flex-col h-full">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center bg-white overflow-hidden shrink-0">
+              <User size={30} className="text-black mt-2" fill="black" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[17px] font-serif text-black leading-tight">
+                {review.name}
+              </span>
+              <span className="text-[14px] text-gray-400 font-serif mt-1">
+                {review.date}
+              </span>
+            </div>
+          </div>
+          <GoogleGIcon className="w-6 h-6 shrink-0 mt-1" />
         </div>
-      </div>
 
-      <div className="relative">
-        <div
-          ref={trackRef}
-          className="no-scrollbar flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-2"
-        >
-          {reviews.map((review) => (
-            <ReviewCard
-              key={review.id}
-              name={review.name}
-              rating={review.rating}
-              content={review.content}
-              verified
-              className="w-96 snap-start"
-            />
+        <div className="flex items-center gap-1 mb-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            i < review.rating ? (
+              <StarFilled key={i} className="w-[18px] h-[18px]" />
+            ) : (
+              <StarUnfilled key={i} className="w-[18px] h-[18px]" />
+            )
           ))}
         </div>
 
-        {/* Mobile arrows under track */}
-        <div className="mt-4 flex items-center justify-center gap-2 md:hidden">
-          <Button
-            type="button"
-            aria-label="Previous review"
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 rounded-full border-black/10 text-base text-black hover:bg-black hover:text-white"
-            onClick={() => handleScroll("prev")}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            type="button"
-            aria-label="Next review"
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 rounded-full border-black/10 text-base text-black hover:bg-black hover:text-white"
-            onClick={() => handleScroll("next")}
-          >
-            <ArrowRight className="h-4 w-4" />
-          </Button>
+        <p className="text-[15px] leading-relaxed text-black font-serif whitespace-pre-wrap">
+          {review.content}
+        </p>
+      </div>
+
+      {/* Speech bubble tail */}
+      <div className="absolute -bottom-2 right-8 w-6 h-6 bg-white border-b border-r border-gray-200 transform rotate-45 z-0"></div>
+    </div>
+  )
+}
+
+export function ReviewCarousel() {
+  return (
+    <section className="mt-8 overflow-x-hidden bg-white mb-8">
+      <div className="flex flex-col items-center justify-center gap-4 text-center mb-12">
+        <GoogleLogo className="w-[160px] h-auto" />
+
+        <div className="flex items-center gap-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            i < 4 ? <StarFilled key={i} className="w-8 h-8" /> : <StarUnfilled key={i} className="w-8 h-8" />
+          ))}
+        </div>
+
+        <p className="text-gray-600 text-[15px]">
+          Based on <span className="font-semibold text-black">454</span> reviews.
+        </p>
+      </div>
+
+      <div className="relative">
+        <div className="no-scrollbar flex w-full snap-x snap-mandatory gap-6 overflow-x-auto pb-6 px-4 md:px-8 max-w-[1440px] mx-auto">
+          {reviews.map((review, i) => (
+            <div key={`${review.id}-${i}`} className="snap-center pt-2">
+              <GoogleReviewCard review={review} />
+            </div>
+          ))}
         </div>
       </div>
     </section>

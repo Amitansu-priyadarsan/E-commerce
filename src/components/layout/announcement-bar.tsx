@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom"
 import { X } from "lucide-react"
 import { useState } from "react"
 
@@ -8,23 +7,33 @@ export function AnnouncementBar() {
   if (!isVisible) return null
 
   return (
-    <div className="relative flex w-full items-center justify-center bg-black px-4 py-2 text-xs text-white">
-      <p className="flex flex-wrap items-center gap-1 text-[14px] leading-none">
-        <span className="font-normal">Sign up and get 20% off to your first order.</span>
-        <Link
-          to="/signup"
-          className="font-medium underline underline-offset-4 hover:opacity-80"
-        >
-          Sign Up Now
-        </Link>
-      </p>
+    <div
+      className="relative flex w-full items-center justify-center px-12 py-2 md:px-16 md:py-1.5"
+      style={{
+        minHeight: '40px',
+        background: 'rgba(246.50, 12.32, 12.32, 0.02)',
+        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)'
+      }}
+    >
+      <div
+        className="text-center w-full text-sm sm:text-lg md:text-2xl leading-snug md:leading-normal"
+        style={{
+          color: '#AE2534',
+          fontFamily: '"Joan", serif',
+          fontWeight: 400,
+          wordWrap: 'break-word'
+        }}
+      >
+        "Welcome to Bahurani – Elegance in Every Thread! Happy Shopping!" 😊
+      </div>
       <button
         type="button"
         aria-label="Close announcement"
         onClick={() => setIsVisible(false)}
-        className="absolute right-4 flex h-5 w-5 items-center justify-center rounded-sm text-white/80 transition hover:bg-white/10 hover:text-white"
+        className="absolute right-4 flex h-6 w-6 items-center justify-center rounded-sm transition hover:opacity-75"
+        style={{ color: '#AE2534' }}
       >
-        <X className="h-4 w-4" />
+        <X className="h-5 w-5" />
       </button>
     </div>
   )
