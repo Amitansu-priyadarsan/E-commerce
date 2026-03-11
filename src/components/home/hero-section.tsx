@@ -6,7 +6,7 @@ export function HeroSection() {
       <img
         src={heroImage}
         alt="Hero Fashion"
-        className="h-[709px] w-full object-cover"
+        className="h-[250px] sm:h-[700px] md:h-[800px] w-full object-cover object-center"
       />
     </section>
   )

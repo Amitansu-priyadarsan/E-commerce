@@ -8,7 +8,7 @@ export function AnnouncementBar() {
 
   return (
     <div
-      className="relative flex w-full items-center justify-center px-10 py-1"
+      className="relative flex w-full items-center justify-center px-12 py-2 md:px-16 md:py-1.5"
       style={{
         minHeight: '40px',
         background: 'rgba(246.50, 12.32, 12.32, 0.02)',
@@ -16,10 +16,9 @@ export function AnnouncementBar() {
       }}
     >
       <div
-        className="text-center w-full"
+        className="text-center w-full text-sm sm:text-lg md:text-2xl leading-snug md:leading-normal"
         style={{
           color: '#AE2534',
-          fontSize: '24px',
           fontFamily: '"Joan", serif',
           fontWeight: 400,
           wordWrap: 'break-word'
