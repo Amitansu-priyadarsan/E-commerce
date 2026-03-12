@@ -67,7 +67,7 @@ export function ProductDetailPage() {
   ]
 
   if (!product) {
-    return <div className="py-10 text-sm text-zinc-700">Product not found.</div>
+    return <div className="flex items-center justify-center py-20 text-sm font-medium text-zinc-500 lg:min-h-[600px]">Product not found.</div>
   }
 
   const handleAddToCart = () => {
@@ -84,7 +84,7 @@ export function ProductDetailPage() {
   }
 
   return (
-    <div className="space-y-10 py-6 pb-16">
+    <div className="space-y-10 py-6 pb-16 lg:min-h-[800px]">
       <section className="grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         <ImageGallery image={product.image} />
         <ProductInfo
@@ -144,9 +144,9 @@ export function ProductDetailPage() {
             <div className="grid gap-6 pt-6 md:grid-cols-2">
               <div className="space-y-3 text-sm text-zinc-600">
                 <p>
-                  This graphic t-shirt is perfect for any occasion. Crafted from
-                  a soft and breathable cotton blend, it offers superior comfort
-                  and all-day wearability.
+                  Elevate your ethnic wardrobe with this exquisite piece. Crafted from
+                  premium quality fabric, it offers unmatched comfort
+                  and timeless style for every occasion.
                 </p>
                 <ul className="list-disc space-y-1 pl-5">
                   <li>Relaxed fit with dropped shoulders</li>
@@ -159,8 +159,8 @@ export function ProductDetailPage() {
                 <h3 className="text-sm font-semibold text-zinc-900">
                   Size &amp; Fit
                 </h3>
-                <p>Model is 6'1&quot; and wears a size Large.</p>
-                <p>Fits true to size. For an oversized look, size up.</p>
+                <p>Standard sizes available. Most items are regular fit.</p>
+                <p>Check the size chart for detailed measurements.</p>
               </div>
             </div>
           </TabsContent>
@@ -280,7 +280,7 @@ function ImageGallery({ image }: ImageGalleryProps) {
           </button>
         ))}
       </div>
-      <Card className="overflow-hidden rounded-[20px] border-none bg-[#F0EEED] p-0">
+      <Card className="overflow-hidden rounded-[20px] border-none bg-white p-0">
         <div className="aspect-[4/5] w-full">
           <img
             src={image}
@@ -340,16 +340,16 @@ function ProductInfo({
       </div>
 
       <div className="flex items-end gap-3 font-satoshi">
-        <span className="text-3xl font-bold text-zinc-900">${price}</span>
+        <span className="text-3xl font-bold text-zinc-900">₹{price.toLocaleString("en-IN")}</span>
         {originalPrice && (
           <span className="text-xl font-bold text-zinc-400 line-through">
-            ${originalPrice}
+            ₹{originalPrice.toLocaleString("en-IN")}
           </span>
         )}
       </div>
 
       <p className="font-satoshi text-sm text-zinc-500">
-        This graphic t-shirt is perfect for any occasion. Crafted from a soft and breathable fabric, it offers superior comfort and style.
+        This beautiful ensemble is perfect for any traditional occasion. Crafted from premium breathable fabric, it offers superior comfort and elegant style.
       </p>
 
       <hr className="border-zinc-200" />

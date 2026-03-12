@@ -8,11 +8,12 @@ import { Menu, X } from "lucide-react"
 
 const CATEGORY_ITEMS = [
   "All",
-  "SAREE",
-  "LEHENGA",
-  "INDO WESTERN",
-  "RAJPUTI POSHAK",
-  "KURTIS",
+  "Kurtis",
+  "Saree",
+  "Lehenga",
+  "Salwar",
+  "Anarkali",
+  "Pashtuni",
 ]
 
 const LINK_ITEMS = [
