@@ -199,7 +199,7 @@ export function Navbar() {
             </div>
 
             <div className="p-6 bg-zinc-50 border-t">
-              <p className="text-center text-xs text-zinc-400 font-medium">© 2024 Pehnava Saree. All rights reserved.</p>
+              <p className="text-center text-xs text-zinc-400 font-medium">© 2024 Pehnava Ethinics. All rights reserved.</p>
             </div>
           </div>
         </>

@@ -24,7 +24,7 @@ export function AnnouncementBar() {
           wordWrap: 'break-word'
         }}
       >
-        "Welcome to Pehnava – Elegance in Every Thread! Happy Shopping!" 😊
+        "Welcome to Pehnava Ethinics – Elegance in Every Thread! Happy Shopping!" 😊
       </div>
       <button
         type="button"
