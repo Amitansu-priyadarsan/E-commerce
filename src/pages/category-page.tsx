@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams, Link } from "react-router-dom"
 import { Settings2, ShoppingCart, Heart, SlidersHorizontal, X } from "lucide-react"
 import { products } from "@/data/products"
@@ -34,11 +34,16 @@ const CATEGORIES = [
   { value: "pashtuni", label: "Pashtuni Poshak" },
 ]
 
+const ITEMS_PER_PAGE = 12
+
 type SortKey = "popular" | "price-low" | "price-high" | "rating"
 
 export function CategoryPage() {
   const { slug } = useParams<{ slug: string }>()
   const { addItem } = useCart()
+
+  // Use local selectedCategory state, initialized from URL slug
+  const [selectedCategory, setSelectedCategory] = useState<string>(slug || "all")
   const [sortKey, setSortKey] = useState<SortKey>("popular")
   const [wishlist, setWishlist] = useState<Set<string>>(new Set())
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 20000])
@@ -46,6 +51,16 @@ export function CategoryPage() {
   const [selectedSizes, setSelectedSizes] = useState<string[]>([])
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [addedToCart, setAddedToCart] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+
+  // Sync selectedCategory when URL slug changes (e.g., from navbar navigation)
+  useEffect(() => {
+    setSelectedCategory(slug || "all")
+    setCurrentPage(1)
+  }, [slug])
+
+  // Reset to page 1 when any filter changes
+  const resetPage = useCallback(() => setCurrentPage(1), [])
 
   const toggleWishlist = (id: string) => {
     setWishlist((prev) => {
@@ -70,16 +85,45 @@ export function CategoryPage() {
     setTimeout(() => setAddedToCart(null), 1500)
   }
 
-  // Filter products
+  // Handle category selection locally (no navigation)
+  const handleCategorySelect = (categoryValue: string) => {
+    setSelectedCategory(categoryValue)
+    resetPage()
+  }
+
+  // Handle price range change
+  const handlePriceChange = (values: [number, number]) => {
+    setPriceRange(values)
+    resetPage()
+  }
+
+  // Handle color selection
+  const handleColorToggle = (hex: string) => {
+    setSelectedColors((prev) => {
+      const next = prev.includes(hex) ? prev.filter((c) => c !== hex) : [...prev, hex]
+      return next
+    })
+    resetPage()
+  }
+
+  // Handle size selection
+  const handleSizeToggle = (size: string) => {
+    setSelectedSizes((prev) => {
+      const next = prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
+      return next
+    })
+    resetPage()
+  }
+
+  // Filter products using local selectedCategory state
   let filtered = products.filter((p) => {
-    // Category filter: if slug is "all", show everything; otherwise filter by slug
-    const matchSlug = slug === "all" || p.category === slug
+    const matchCategory = selectedCategory === "all" || p.category === selectedCategory
     const matchPrice = p.price >= priceRange[0] && p.price <= priceRange[1]
     const matchColor =
       selectedColors.length === 0 || selectedColors.some((c) => p.colors.includes(c))
     const matchSize =
       selectedSizes.length === 0 || selectedSizes.some((s) => p.sizes.includes(s))
-    return matchSlug && matchPrice && matchColor && matchSize
+    return matchCategory && matchPrice && matchColor && matchSize
   })
 
   // Apply sort
@@ -87,8 +131,19 @@ export function CategoryPage() {
   else if (sortKey === "price-high") filtered = [...filtered].sort((a, b) => b.price - a.price)
   else if (sortKey === "rating") filtered = [...filtered].sort((a, b) => b.rating - a.rating)
 
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE))
+  const safePage = Math.min(currentPage, totalPages)
+  const paginatedProducts = filtered.slice(
+    (safePage - 1) * ITEMS_PER_PAGE,
+    safePage * ITEMS_PER_PAGE
+  )
+
   const categoryLabel =
-    CATEGORIES.find((c) => c.value === slug)?.label ?? "All Products"
+    CATEGORIES.find((c) => c.value === selectedCategory)?.label ?? "All Products"
+
+  // Check if any filter (besides category) is active
+  const hasActiveFilters = selectedColors.length > 0 || selectedSizes.length > 0 || priceRange[0] > 0 || priceRange[1] < 20000
 
   const FilterPanel = () => (
     <div className="space-y-1">
@@ -97,9 +152,14 @@ export function CategoryPage() {
           <SlidersHorizontal className="h-4 w-4" />
           Filters
         </h2>
-        {(selectedColors.length > 0 || selectedSizes.length > 0) && (
+        {hasActiveFilters && (
           <button
-            onClick={() => { setSelectedColors([]); setSelectedSizes([]) }}
+            onClick={() => {
+              setSelectedColors([])
+              setSelectedSizes([])
+              setPriceRange([0, 20000])
+              resetPage()
+            }}
             className="text-[11px] font-medium text-red-500 hover:text-red-700 transition-colors"
           >
             Clear all
@@ -113,19 +173,20 @@ export function CategoryPage() {
           <AccordionContent>
             <div className="space-y-2.5">
               {CATEGORIES.map((cat) => (
-                <Link
+                <button
                   key={cat.value}
-                  to={`/category/${cat.value}`}
-                  className={`flex items-center gap-2 text-sm transition-colors ${slug === cat.value
+                  type="button"
+                  onClick={() => handleCategorySelect(cat.value)}
+                  className={`flex items-center gap-2 text-sm transition-colors w-full text-left ${selectedCategory === cat.value
                     ? "font-semibold text-zinc-900"
                     : "text-zinc-500 hover:text-zinc-800"
                     }`}
                 >
-                  {slug === cat.value && (
+                  {selectedCategory === cat.value && (
                     <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
                   )}
                   {cat.label}
-                </Link>
+                </button>
               ))}
             </div>
           </AccordionContent>
@@ -134,7 +195,7 @@ export function CategoryPage() {
         <AccordionItem value="price">
           <AccordionTrigger>Price Range</AccordionTrigger>
           <AccordionContent>
-            <PriceSlider min={0} max={20000} values={priceRange} onChange={setPriceRange} />
+            <PriceSlider min={0} max={20000} values={priceRange} onChange={handlePriceChange} />
             <div className="mt-3 flex justify-between text-xs font-medium text-zinc-700">
               <span>₹{priceRange[0].toLocaleString("en-IN")}</span>
               <span>₹{priceRange[1].toLocaleString("en-IN")}</span>
@@ -150,13 +211,7 @@ export function CategoryPage() {
                 <button
                   key={color.hex}
                   title={color.label}
-                  onClick={() =>
-                    setSelectedColors((prev) =>
-                      prev.includes(color.hex)
-                        ? prev.filter((c) => c !== color.hex)
-                        : [...prev, color.hex]
-                    )
-                  }
+                  onClick={() => handleColorToggle(color.hex)}
                   className={`h-8 w-8 rounded-full border-[2.5px] transition-all duration-200 ${selectedColors.includes(color.hex)
                     ? "border-zinc-900 scale-110 shadow-lg"
                     : "border-zinc-200 hover:border-zinc-400 hover:scale-105"
@@ -176,11 +231,7 @@ export function CategoryPage() {
               {SIZES.map((size) => (
                 <button
                   key={size}
-                  onClick={() =>
-                    setSelectedSizes((prev) =>
-                      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
-                    )
-                  }
+                  onClick={() => handleSizeToggle(size)}
                   className={`rounded-full border px-3 py-1 text-[11px] font-medium transition-all ${selectedSizes.includes(size)
                     ? "border-zinc-900 bg-zinc-900 text-white"
                     : "border-zinc-200 text-zinc-600 hover:border-zinc-400"
@@ -197,10 +248,7 @@ export function CategoryPage() {
   )
 
   return (
-    // Negative margin to break out of layout's px-4 sm:px-8 padding
     <div className="-mx-4 -mt-6 sm:-mx-8 min-h-screen bg-white">
-
-
       <div className="px-6 py-8">
         <div className="mx-auto max-w-[1400px]">
           <div className="flex gap-10">
@@ -238,7 +286,7 @@ export function CategoryPage() {
             {/* ── Product Grid ────────────────────────────────── */}
             <section className="flex-1 min-w-0 space-y-6 lg:min-h-[700px]">
 
-              {/* Breadcrumb + Page Title (Now inside column) */}
+              {/* Breadcrumb + Page Title */}
               <div className="mb-2">
                 <nav className="mb-1.5 text-xs text-zinc-400">
                   <Link to="/" className="hover:text-zinc-700 transition-colors">Home</Link>
@@ -248,7 +296,6 @@ export function CategoryPage() {
                 <div className="flex items-end justify-between">
                   <div>
                     <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">{categoryLabel}</h1>
-
                   </div>
                   {/* Mobile filter toggle */}
                   <button
@@ -261,6 +308,46 @@ export function CategoryPage() {
                 </div>
               </div>
 
+              {/* Active Filters Chips */}
+              {hasActiveFilters && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-zinc-500 font-medium">Active:</span>
+                  {selectedColors.map((hex) => {
+                    const colorLabel = COLORS.find((c) => c.hex === hex)?.label ?? hex
+                    return (
+                      <button
+                        key={hex}
+                        onClick={() => handleColorToggle(hex)}
+                        className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[11px] font-medium text-zinc-700 hover:bg-zinc-100 transition-colors"
+                      >
+                        <span className="h-2.5 w-2.5 rounded-full border border-zinc-300" style={{ backgroundColor: hex }} />
+                        {colorLabel}
+                        <X className="h-3 w-3 text-zinc-400" />
+                      </button>
+                    )
+                  })}
+                  {selectedSizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => handleSizeToggle(size)}
+                      className="flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[11px] font-medium text-zinc-700 hover:bg-zinc-100 transition-colors"
+                    >
+                      {size}
+                      <X className="h-3 w-3 text-zinc-400" />
+                    </button>
+                  ))}
+                  {(priceRange[0] > 0 || priceRange[1] < 20000) && (
+                    <button
+                      onClick={() => { setPriceRange([0, 20000]); resetPage() }}
+                      className="flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[11px] font-medium text-zinc-700 hover:bg-zinc-100 transition-colors"
+                    >
+                      ₹{priceRange[0].toLocaleString("en-IN")} – ₹{priceRange[1].toLocaleString("en-IN")}
+                      <X className="h-3 w-3 text-zinc-400" />
+                    </button>
+                  )}
+                </div>
+              )}
+
               {/* Sort Bar */}
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white px-5 py-3 border border-zinc-100">
                 <p className="text-sm text-zinc-600">
@@ -268,7 +355,10 @@ export function CategoryPage() {
                 </p>
                 <Select
                   defaultValue="popular"
-                  onChange={(e) => setSortKey(e.target.value as SortKey)}
+                  onChange={(e) => {
+                    setSortKey(e.target.value as SortKey)
+                    resetPage()
+                  }}
                 >
                   <option value="popular">Sort: Most Popular</option>
                   <option value="rating">Sort: Top Rated</option>
@@ -283,10 +373,22 @@ export function CategoryPage() {
                   <div className="text-6xl mb-4">🪷</div>
                   <p className="text-lg font-semibold text-zinc-700">No products found</p>
                   <p className="mt-1 text-sm text-zinc-400">Try adjusting or clearing your filters</p>
+                  <button
+                    onClick={() => {
+                      setSelectedColors([])
+                      setSelectedSizes([])
+                      setPriceRange([0, 20000])
+                      setSelectedCategory("all")
+                      resetPage()
+                    }}
+                    className="mt-4 rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-800 transition-colors"
+                  >
+                    Reset All Filters
+                  </button>
                 </div>
               ) : (
                 <div className="grid gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-                  {filtered.map((product) => {
+                  {paginatedProducts.map((product) => {
                     const discount =
                       product.originalPrice && product.originalPrice > product.price
                         ? Math.round(
@@ -303,8 +405,7 @@ export function CategoryPage() {
                         {/* Product Image */}
                         <Link
                           to={`/product/${product.id}`}
-                          className="relative block overflow-hidden rounded-t-2xl bg-white"
-                          style={{ height: "300px" }}
+                          className="relative block overflow-hidden rounded-t-2xl bg-white aspect-[3/4]"
                         >
                           <img
                             src={typeof product.image === "string" ? product.image : product.image}
@@ -431,7 +532,14 @@ export function CategoryPage() {
                 </div>
               )}
 
-              <Pagination page={1} totalPages={Math.max(1, Math.ceil(filtered.length / 12))} />
+              <Pagination
+                page={safePage}
+                totalPages={totalPages}
+                onPageChange={(p) => {
+                  setCurrentPage(p)
+                  window.scrollTo({ top: 0, behavior: "smooth" })
+                }}
+              />
             </section>
           </div>
         </div>
