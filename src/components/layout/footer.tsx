@@ -54,19 +54,19 @@ export function Footer() {
             <li>
               <a href="#" className="flex items-center gap-3 hover:text-red-700 transition-colors">
                 <Facebook className="h-5 w-5 text-red-600" />
-                <span>@bahuranisareebhopal</span>
+                <span>@pehnava.in</span>
               </a>
             </li>
             <li>
               <a href="#" className="flex items-center gap-3 hover:text-red-700 transition-colors">
                 <Instagram className="h-5 w-5 text-red-600" />
-                <span>bahurani_</span>
+                <span>pehnava.in</span>
               </a>
             </li>
             <li>
               <a href="#" className="flex items-center gap-3 hover:text-red-700 transition-colors">
                 <Youtube className="h-5 w-5 text-red-600" />
-                <span>Bahurani Saree</span>
+                <span>pehnava.in</span>
               </a>
             </li>
           </ul>

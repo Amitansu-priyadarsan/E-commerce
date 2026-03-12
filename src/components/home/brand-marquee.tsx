@@ -89,7 +89,7 @@ export function BrandMarquee() {
       </div>
       <div className="mt-20 w-full flex flex-col items-center justify-center text-center">
         <div style={{ color: "#AE2534", fontSize: "36px", fontFamily: "Joan", fontWeight: 400, wordWrap: "break-word" }}>
-          Fashion Moment With Bahurani
+          Fashion Moment With Pehnava
         </div>
         <HeartIcon className="my-4" />
         <div style={{ color: "black", fontSize: "36px", fontFamily: "Joan", fontWeight: 400, wordWrap: "break-word" }}>
