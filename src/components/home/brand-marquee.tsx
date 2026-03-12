@@ -11,19 +11,19 @@ import Lehenga2Image from "@/assets/Hero/Lehenga2.png"
 import { HeartIcon } from "@/components/home/heart-icon"
 
 const specialties = [
-  { id: "saree-chanderi", name: "Chanderi Saree", image: ChanderiSaree },
-  { id: "saree-maheshwari", name: "Maheshwari Saree", image: MaheshwariSaree },
-  { id: "saree-kanchipuram", name: "Kanchipuram Saree", image: KanchipuramSaree },
-  { id: "saree-banarasi", name: "Banarasi Saree", image: BanarasiSaree },
-  { id: "saree-rajputi", name: "Rajputi Saree", image: RajputiSaree },
+  { id: "saree", name: "Chanderi Saree", image: ChanderiSaree },
+  { id: "saree", name: "Maheshwari Saree", image: MaheshwariSaree },
+  { id: "saree", name: "Kanchipuram Saree", image: KanchipuramSaree },
+  { id: "saree", name: "Banarasi Saree", image: BanarasiSaree },
+  { id: "saree", name: "Rajputi Saree", image: RajputiSaree },
 ]
 
 const productTypes = [
-  { id: "type-saree", name: "Saree", image: KanchipuramSaree }, // Based on screenshot, maybe Kanchipuram is best fit for the "Saree" card
-  { id: "type-lehenga", name: "Lehenga", image: LehengaImage },
-  { id: "type-indo-western", name: "Indo Western", image: IndoWesternImage },
-  { id: "type-poshak", name: "Poshak", image: PoshakImage },
-  { id: "type-bridal-lehenga", name: "Bridal Lehenga", image: Lehenga2Image },
+  { id: "saree", name: "Saree", image: KanchipuramSaree },
+  { id: "lehenga", name: "Lehenga", image: LehengaImage },
+  { id: "all", name: "Indo Western", image: IndoWesternImage },
+  { id: "pashtuni", name: "Poshak", image: PoshakImage },
+  { id: "lehenga", name: "Bridal Lehenga", image: Lehenga2Image },
 ]
 
 export function BrandMarquee() {

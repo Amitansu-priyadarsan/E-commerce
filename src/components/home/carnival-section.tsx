@@ -11,7 +11,7 @@ import KanchipuramImg from "@/assets/Hero/Kanchipuram.png"
 
 const mockProducts = [
     {
-        id: 1,
+        id: "lehenga-bridal-pink",
         name: "Swarna Saaj Bridal Lehenga",
         price: "4,500.00",
         image: LehengaImg,
@@ -19,7 +19,7 @@ const mockProducts = [
         reviews: 5,
     },
     {
-        id: 2,
+        id: "lehenga-navratri-multicolor",
         name: "Swarna Saaj Bridal Lehenga",
         price: "4,500.00",
         image: Lehenga2Img,
@@ -27,7 +27,7 @@ const mockProducts = [
         reviews: 5,
     },
     {
-        id: 3,
+        id: "lehenga-floral-yellow",
         name: "Swarna Saaj Bridal Lehenga",
         price: "4,500.00",
         image: BanarasiImg,
@@ -35,7 +35,7 @@ const mockProducts = [
         reviews: 5,
     },
     {
-        id: 4,
+        id: "lehenga-anarkali-blue",
         name: "Swarna Saaj Bridal Lehenga",
         price: "4,500.00",
         image: KanchipuramImg,
@@ -50,7 +50,7 @@ export function CarnivalSection() {
 
     const handleAddToCart = (product: typeof mockProducts[0]) => {
         addItem({
-            id: `carnival-${product.id}`,
+            id: product.id,
             name: product.name,
             price: parseInt(product.price.replace(/,/g, "")),
             image: product.image,
@@ -80,7 +80,7 @@ export function CarnivalSection() {
             <div className="w-full max-w-[1440px] px-4 md:px-8 mt-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {mockProducts.map((product) => (
-                        <div key={product.id} className="group relative flex flex-col gap-3">
+                        <div key={product.id} className="group relative flex flex-col gap-3 cursor-pointer" onClick={() => navigate(`/product/${product.id}`, { state: { product: { id: product.id, name: product.name, price: parseInt(product.price.replace(/,/g, "")), image: product.image, rating: product.rating, reviews: product.reviews, category: "lehenga" as const, colors: ["#FF69B4", "#FFD700", "#8B1A1A"], sizes: ["S", "M", "L", "XL", "Free Size"] } } })}>
                             <div className="relative w-full aspect-[3/4] overflow-hidden rounded-2xl bg-[#F0EEED]">
                                 <img
                                     src={product.image}
@@ -98,14 +98,14 @@ export function CarnivalSection() {
                                     <Button
                                         variant="secondary"
                                         className="h-9 flex-1 bg-white text-black hover:bg-zinc-100 rounded-lg text-xs font-semibold shadow-sm flex items-center justify-center gap-1.5"
-                                        onClick={() => handleAddToCart(product)}
+                                        onClick={(e) => { e.stopPropagation(); handleAddToCart(product) }}
                                     >
                                         Add to cart <ShoppingCart className="h-3.5 w-3.5" />
                                     </Button>
                                     <Button
                                         variant="secondary"
                                         className="h-9 flex-1 bg-white text-black hover:bg-zinc-100 rounded-lg text-xs font-semibold shadow-sm flex items-center justify-center gap-1.5"
-                                        onClick={() => handleBuyNow(product)}
+                                        onClick={(e) => { e.stopPropagation(); handleBuyNow(product) }}
                                     >
                                         Buy now <ShoppingCart className="h-3.5 w-3.5" />
                                     </Button>
