@@ -81,7 +81,7 @@ export function CarnivalSection() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {mockProducts.map((product) => (
                         <div key={product.id} className="group relative flex flex-col gap-3">
-                            <div className="relative w-full aspect-3/4 overflow-hidden rounded-2xl bg-[#F0EEED]">
+                            <div className="relative w-full aspect-[3/4] overflow-hidden rounded-2xl bg-[#F0EEED]">
                                 <img
                                     src={product.image}
                                     alt={product.name}

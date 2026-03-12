@@ -23,22 +23,16 @@ function ScrollToTopOnRouteChange() {
 }
 
 function App() {
-  const { pathname } = useLocation()
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Check if we should skip the loader for this route
-    const isCategoryPage = pathname.startsWith("/category/")
+    // Show loader only on first mount
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 1500) // Slightly longer for initial impact
 
-    if (!isCategoryPage) {
-      setIsLoading(true)
-      const timer = setTimeout(() => {
-        setIsLoading(false)
-      }, 1000) // 1 second loader
-
-      return () => clearTimeout(timer)
-    }
-  }, [pathname])
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
     <Layout>

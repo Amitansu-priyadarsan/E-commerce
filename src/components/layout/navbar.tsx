@@ -118,11 +118,11 @@ export function Navbar() {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/40 z-100 md:hidden transition-opacity"
+            className="fixed inset-0 bg-black/40 z-[100] md:hidden transition-opacity"
             onClick={() => setIsMenuOpen(false)}
           />
           {/* Menu Panel */}
-          <div className="fixed top-0 left-0 bottom-0 w-[80%] max-w-[320px] bg-white z-101 md:hidden flex flex-col shadow-2xl transition-transform duration-300 ease-in-out">
+          <div className="fixed top-0 left-0 bottom-0 w-[80%] max-w-[320px] bg-white z-[101] md:hidden flex flex-col shadow-2xl transition-transform duration-300 ease-in-out">
             <div className="p-6 border-b flex items-center justify-between">
               <Link to="/" onClick={() => setIsMenuOpen(false)}>
                 <img src={logoImg} alt="Logo" className="h-10 w-auto" />
