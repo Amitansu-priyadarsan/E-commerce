@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Routes, Route, Navigate, useLocation } from "react-router-dom"
 import { Layout } from "@/components/layout/layout"
 import { HomePage } from "@/pages/home-page"
@@ -8,6 +8,7 @@ import { CartPage } from "@/pages/cart-page"
 import { ProfilePage } from "@/pages/profile-page"
 import { WishlistPage } from "@/pages/wishlist-page"
 import { ContactUsPage } from "@/pages/contact-us-page"
+import PageLoader from "@/components/layout/page-loader"
 
 function ScrollToTopOnRouteChange() {
   const { pathname } = useLocation()
@@ -22,8 +23,26 @@ function ScrollToTopOnRouteChange() {
 }
 
 function App() {
+  const { pathname } = useLocation()
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    // Check if we should skip the loader for this route
+    const isCategoryPage = pathname.startsWith("/category/")
+
+    if (!isCategoryPage) {
+      setIsLoading(true)
+      const timer = setTimeout(() => {
+        setIsLoading(false)
+      }, 1000) // 1 second loader
+
+      return () => clearTimeout(timer)
+    }
+  }, [pathname])
+
   return (
     <Layout>
+      {isLoading && <PageLoader />}
       <ScrollToTopOnRouteChange />
       <Routes>
         <Route path="/" element={<HomePage />} />

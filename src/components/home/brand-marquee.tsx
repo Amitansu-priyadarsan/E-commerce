@@ -63,7 +63,7 @@ export function BrandMarquee() {
           {specialties.map((item) => (
             <div
               key={item.id}
-              className="group relative cursor-pointer w-full rounded-lg overflow-hidden border border-black/5"
+              className="group relative cursor-pointer w-full rounded-lg overflow-hidden"
               onClick={() => {
                 navigate(`/category/${item.id}`)
               }}
@@ -102,7 +102,7 @@ export function BrandMarquee() {
           {productTypes.map((item) => (
             <div
               key={item.id}
-              className="group relative cursor-pointer w-full rounded-lg overflow-hidden border border-black/5"
+              className="group relative cursor-pointer w-full rounded-lg overflow-hidden"
               onClick={() => {
                 navigate(`/category/${item.id}`)
               }}

@@ -8,11 +8,12 @@ import { Menu, X } from "lucide-react"
 
 const CATEGORY_ITEMS = [
   "All",
-  "SAREE",
-  "LEHENGA",
-  "INDO WESTERN",
-  "RAJPUTI POSHAK",
-  "KURTIS",
+  "Kurtis",
+  "Saree",
+  "Lehenga",
+  "Salwar",
+  "Anarkali",
+  "Pashtuni",
 ]
 
 const LINK_ITEMS = [
@@ -39,7 +40,7 @@ export function Navbar() {
           </button>
 
           <Link to="/" className="shrink-0 flex items-center">
-            <img src={logoImg} alt="Shop.co Logo" className="h-[36px] sm:h-[45px] md:h-[50px] w-auto drop-shadow-sm" />
+            <img src={logoImg} alt="Shop.co Logo" className="h-[36px] sm:h-[45px] md:h-[50px] w-auto " />
           </Link>
         </div>
 

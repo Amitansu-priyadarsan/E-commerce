@@ -13,7 +13,7 @@ export function CartPage() {
   const total = subtotal - discount + delivery
 
   return (
-    <div className="grid gap-8 py-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,0.9fr)]">
+    <div className="grid gap-8 py-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,0.9fr)] lg:min-h-[600px]">
       <section className="space-y-4">
         <h1 className="text-xl font-black uppercase tracking-[0.25em]">
           Cart

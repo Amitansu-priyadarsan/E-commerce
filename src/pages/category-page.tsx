@@ -1,127 +1,563 @@
-import { useParams } from "react-router-dom"
-import { Settings2 } from "lucide-react"
+import { useState, useEffect, useCallback } from "react"
+import { useParams, Link } from "react-router-dom"
+import { Settings2, ShoppingCart, Heart, SlidersHorizontal, X } from "lucide-react"
 import { products } from "@/data/products"
-import { ProductCard } from "@/components/home/product-card"
+import { useCart } from "@/contexts/cart-context"
+import { useWishlist } from "@/contexts/wishlist-context"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
 import { PriceSlider } from "@/components/ui/slider"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Select } from "@/components/ui/select"
 import { Pagination } from "@/components/ui/pagination"
+import { Star } from "lucide-react"
 
-const COLORS = ["#111111", "#F0F0F0", "#9CA3AF", "#4B5563"]
-const SIZES = ["XS", "S", "M", "L", "XL"]
+const COLORS = [
+  { hex: "#8B0000", label: "Deep Red" },
+  { hex: "#1E3A5F", label: "Navy Blue" },
+  { hex: "#2D5016", label: "Forest Green" },
+  { hex: "#FFD700", label: "Golden" },
+  { hex: "#FF69B4", label: "Pink" },
+  { hex: "#9B59B6", label: "Purple" },
+  { hex: "#008080", label: "Teal" },
+  { hex: "#FF6B35", label: "Orange" },
+  { hex: "#111111", label: "Black" },
+  { hex: "#C0392B", label: "Red" },
+]
+
+const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "Free Size"]
+
+const CATEGORIES = [
+  { value: "all", label: "All Products" },
+  { value: "kurtis", label: "Kurtis" },
+  { value: "saree", label: "Sarees" },
+  { value: "lehenga", label: "Lehengas" },
+  { value: "salwar", label: "Salwar Suits" },
+  { value: "anarkali", label: "Anarkalis" },
+  { value: "pashtuni", label: "Pashtuni Poshak" },
+]
+
+const ITEMS_PER_PAGE = 12
+
+type SortKey = "popular" | "price-low" | "price-high" | "rating"
 
 export function CategoryPage() {
   const { slug } = useParams<{ slug: string }>()
+  const { addItem } = useCart()
+  const { toggleWishlist, isInWishlist } = useWishlist()
 
-  const filtered = products.filter((p) =>
-    slug === "all" ? true : p.category === (slug as any)
+  // Use local selectedCategory state, initialized from URL slug
+  const [selectedCategory, setSelectedCategory] = useState<string>(slug || "all")
+  const [sortKey, setSortKey] = useState<SortKey>("popular")
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 20000])
+  const [selectedColors, setSelectedColors] = useState<string[]>([])
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([])
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const [addedToCart, setAddedToCart] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [openAccordionSections, setOpenAccordionSections] = useState<string[]>(["category"])
+
+  // Sync selectedCategory when URL slug changes (e.g., from navbar navigation)
+  useEffect(() => {
+    setSelectedCategory(slug || "all")
+    setCurrentPage(1)
+  }, [slug])
+
+  // Automatically expand accordion sections when filters become active
+  useEffect(() => {
+    setOpenAccordionSections(prev => {
+      const next = new Set(prev)
+      next.add("category") // Always keep category open/available
+
+      if (selectedColors.length > 0) next.add("color")
+      if (selectedSizes.length > 0) next.add("size")
+      if (priceRange[0] > 0 || priceRange[1] < 20000) next.add("price")
+
+      return Array.from(next)
+    })
+  }, [selectedColors.length, selectedSizes.length, priceRange])
+
+  // Reset to page 1 when any filter changes
+  const resetPage = useCallback(() => setCurrentPage(1), [])
+
+
+
+  const handleAddToCart = (e: React.MouseEvent, product: typeof products[0]) => {
+    e.preventDefault()
+    e.stopPropagation()
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      image: product.image,
+      quantity: 1,
+    })
+    setAddedToCart(product.id)
+    setTimeout(() => setAddedToCart(null), 1500)
+  }
+
+  // Handle category selection locally (no navigation)
+  const handleCategorySelect = (categoryValue: string) => {
+    setSelectedCategory(categoryValue)
+    resetPage()
+  }
+
+  // Handle price range change
+  const handlePriceChange = (values: [number, number]) => {
+    setPriceRange(values)
+    resetPage()
+  }
+
+  // Handle color selection
+  const handleColorToggle = (hex: string) => {
+    setSelectedColors((prev) => {
+      const next = prev.includes(hex) ? prev.filter((c) => c !== hex) : [...prev, hex]
+      return next
+    })
+    resetPage()
+  }
+
+  // Handle size selection
+  const handleSizeToggle = (size: string) => {
+    setSelectedSizes((prev) => {
+      const next = prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
+      return next
+    })
+    resetPage()
+  }
+
+  // Filter products using local selectedCategory state
+  let filtered = products.filter((p) => {
+    const matchCategory = selectedCategory === "all" || p.category === selectedCategory
+    const matchPrice = p.price >= priceRange[0] && p.price <= priceRange[1]
+    const matchColor =
+      selectedColors.length === 0 || selectedColors.some((c) => p.colors.includes(c))
+    const matchSize =
+      selectedSizes.length === 0 || selectedSizes.some((s) => p.sizes.includes(s))
+    return matchCategory && matchPrice && matchColor && matchSize
+  })
+
+  // Apply sort
+  if (sortKey === "price-low") filtered = [...filtered].sort((a, b) => a.price - b.price)
+  else if (sortKey === "price-high") filtered = [...filtered].sort((a, b) => b.price - a.price)
+  else if (sortKey === "rating") filtered = [...filtered].sort((a, b) => b.rating - a.rating)
+
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE))
+  const safePage = Math.min(currentPage, totalPages)
+  const paginatedProducts = filtered.slice(
+    (safePage - 1) * ITEMS_PER_PAGE,
+    safePage * ITEMS_PER_PAGE
+  )
+
+  const categoryLabel =
+    CATEGORIES.find((c) => c.value === selectedCategory)?.label ?? "All Products"
+
+  // Check if any filter (besides category) is active
+  const hasActiveFilters = selectedColors.length > 0 || selectedSizes.length > 0 || priceRange[0] > 0 || priceRange[1] < 20000
+
+  // Render filter panel as inline JSX (NOT a component function).
+  // Defining this as `const FilterPanel = () => (...)` would create
+  // a NEW component type on every render, causing React to unmount
+  // and remount the entire panel (resetting accordion open state).
+  const filterPanelContent = (
+    <div className="space-y-1">
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-zinc-800">
+          <SlidersHorizontal className="h-4 w-4" />
+          Filters
+        </h2>
+        {hasActiveFilters && (
+          <button
+            onClick={() => {
+              setSelectedColors([])
+              setSelectedSizes([])
+              setPriceRange([0, 20000])
+              setOpenAccordionSections(["category"])
+              resetPage()
+            }}
+            className="text-[11px] font-medium text-red-500 hover:text-red-700 transition-colors"
+          >
+            Clear all
+          </button>
+        )}
+      </div>
+
+      <Accordion
+        value={openAccordionSections}
+        onValueChange={setOpenAccordionSections}
+      >
+        <AccordionItem value="category">
+          <AccordionTrigger>Category</AccordionTrigger>
+          <AccordionContent>
+            <div className="space-y-2.5">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.value}
+                  type="button"
+                  onClick={() => handleCategorySelect(cat.value)}
+                  className={`flex items-center gap-2 text-sm transition-colors w-full text-left ${selectedCategory === cat.value
+                    ? "font-semibold text-zinc-900"
+                    : "text-zinc-500 hover:text-zinc-800"
+                    }`}
+                >
+                  {selectedCategory === cat.value && (
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-900" />
+                  )}
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="price">
+          <AccordionTrigger>Price Range</AccordionTrigger>
+          <AccordionContent>
+            <PriceSlider min={0} max={20000} values={priceRange} onChange={handlePriceChange} />
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="color">
+          <AccordionTrigger>Color</AccordionTrigger>
+          <AccordionContent>
+            <div className="flex flex-wrap gap-2.5">
+              {COLORS.map((color) => (
+                <button
+                  key={color.hex}
+                  title={color.label}
+                  onClick={() => handleColorToggle(color.hex)}
+                  className={`h-8 w-8 rounded-full border-[2.5px] transition-all duration-200 ${selectedColors.includes(color.hex)
+                    ? "border-zinc-900 scale-110 shadow-lg"
+                    : "border-zinc-200 hover:border-zinc-400 hover:scale-105"
+                    }`}
+                  style={{ backgroundColor: color.hex }}
+                  aria-label={color.label}
+                />
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="size">
+          <AccordionTrigger>Size</AccordionTrigger>
+          <AccordionContent>
+            <div className="flex flex-wrap gap-2">
+              {SIZES.map((size) => (
+                <button
+                  key={size}
+                  onClick={() => handleSizeToggle(size)}
+                  className={`rounded-full border px-3 py-1 text-[11px] font-medium transition-all ${selectedSizes.includes(size)
+                    ? "border-zinc-900 bg-zinc-900 text-white"
+                    : "border-zinc-200 text-zinc-600 hover:border-zinc-400"
+                    }`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
   )
 
   return (
-    <div className="grid gap-8 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-      <aside className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-700">
-            Filters
-          </h2>
-          <Settings2 className="h-4 w-4 text-zinc-500" />
-        </div>
+    <div className="-mx-4 -mt-6 sm:-mx-8 min-h-screen bg-white">
+      <div className="px-6 py-8">
+        <div className="mx-auto max-w-[1400px]">
+          <div className="flex gap-10">
 
-        <Accordion defaultValue="category">
-          <AccordionItem value="category">
-            <AccordionTrigger>Category</AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 text-sm text-zinc-700">
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" defaultChecked className="h-3 w-3 rounded border-zinc-300" />
-                  All
-                </label>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" className="h-3 w-3 rounded border-zinc-300" />
-                  Casual
-                </label>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" className="h-3 w-3 rounded border-zinc-300" />
-                  Formal
-                </label>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" className="h-3 w-3 rounded border-zinc-300" />
-                  Streetwear
-                </label>
+            {/* ── Desktop Sidebar ──────────────────────────────── */}
+            <aside className="hidden lg:block w-[300px] shrink-0">
+              <div className="sticky top-24 rounded-2xl bg-white p-6 border border-zinc-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                {filterPanelContent}
               </div>
-            </AccordionContent>
-          </AccordionItem>
+            </aside>
 
-          <AccordionItem value="price">
-            <AccordionTrigger>Price</AccordionTrigger>
-            <AccordionContent>
-              <PriceSlider min={0} max={250} values={[40, 180]} />
-            </AccordionContent>
-          </AccordionItem>
+            {/* ── Mobile Sidebar Drawer ────────────────────────── */}
+            {mobileSidebarOpen && (
+              <div className="fixed inset-0 z-50 lg:hidden">
+                <div
+                  className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                  onClick={() => setMobileSidebarOpen(false)}
+                />
+                <div className="absolute left-0 top-0 h-full w-[300px] overflow-y-auto bg-white p-6 shadow-2xl">
+                  <div className="mb-4 flex items-center justify-between">
+                    <span className="font-semibold text-zinc-900">Filters</span>
+                    <button
+                      onClick={() => setMobileSidebarOpen(false)}
+                      className="rounded-full bg-zinc-100 p-1.5"
+                      aria-label="Close filters"
+                    >
+                      <X className="h-4 w-4 text-zinc-600" />
+                    </button>
+                  </div>
+                  {filterPanelContent}
+                </div>
+              </div>
+            )}
 
-          <AccordionItem value="color">
-            <AccordionTrigger>Color</AccordionTrigger>
-            <AccordionContent>
-              <ToggleGroup type="single">
-                {COLORS.map((color) => (
-                  <ToggleGroupItem
-                    key={color}
-                    value={color}
-                    className="h-7 w-7 rounded-full border border-zinc-200 p-0"
+            {/* ── Product Grid ────────────────────────────────── */}
+            <section className="flex-1 min-w-0 space-y-6 lg:min-h-[700px]">
+
+              {/* Breadcrumb + Page Title */}
+              <div className="mb-2">
+                <nav className="mb-1.5 text-xs text-zinc-400">
+                  <Link to="/" className="hover:text-zinc-700 transition-colors">Home</Link>
+                  <span className="mx-2">/</span>
+                  <span className="font-medium text-zinc-800">{categoryLabel}</span>
+                </nav>
+                <div className="flex items-end justify-between">
+                  <div>
+                    <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">{categoryLabel}</h1>
+                  </div>
+                  {/* Mobile filter toggle */}
+                  <button
+                    onClick={() => setMobileSidebarOpen(true)}
+                    className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 text-xs font-medium text-zinc-700 shadow-[0_2px_10px_rgb(0,0,0,0.03)] lg:hidden"
                   >
-                    <span
-                      className="block h-5 w-5 rounded-full"
-                      style={{ backgroundColor: color }}
-                    />
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-            </AccordionContent>
-          </AccordionItem>
+                    <Settings2 className="h-3.5 w-3.5" />
+                    Filters
+                  </button>
+                </div>
+              </div>
 
-          <AccordionItem value="size">
-            <AccordionTrigger>Size</AccordionTrigger>
-            <AccordionContent>
-              <ToggleGroup type="multiple">
-                {SIZES.map((size) => (
-                  <ToggleGroupItem key={size} value={size}>
-                    {size}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </aside>
+              {/* Active Filters Chips */}
+              {hasActiveFilters && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-zinc-500 font-medium">Active:</span>
+                  {selectedColors.map((hex) => {
+                    const colorLabel = COLORS.find((c) => c.hex === hex)?.label ?? hex
+                    return (
+                      <button
+                        key={hex}
+                        onClick={() => handleColorToggle(hex)}
+                        className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[11px] font-medium text-zinc-700 hover:bg-zinc-100 transition-colors"
+                      >
+                        <span className="h-2.5 w-2.5 rounded-full border border-zinc-300" style={{ backgroundColor: hex }} />
+                        {colorLabel}
+                        <X className="h-3 w-3 text-zinc-400" />
+                      </button>
+                    )
+                  })}
+                  {selectedSizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => handleSizeToggle(size)}
+                      className="flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[11px] font-medium text-zinc-700 hover:bg-zinc-100 transition-colors"
+                    >
+                      {size}
+                      <X className="h-3 w-3 text-zinc-400" />
+                    </button>
+                  ))}
+                  {(priceRange[0] > 0 || priceRange[1] < 20000) && (
+                    <button
+                      onClick={() => { setPriceRange([0, 20000]); resetPage() }}
+                      className="flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[11px] font-medium text-zinc-700 hover:bg-zinc-100 transition-colors"
+                    >
+                      ₹{priceRange[0].toLocaleString("en-IN")} – ₹{priceRange[1].toLocaleString("en-IN")}
+                      <X className="h-3 w-3 text-zinc-400" />
+                    </button>
+                  )}
+                </div>
+              )}
 
-      <section className="space-y-4">
-        <nav className="text-xs text-zinc-500">
-          Home <span className="mx-1">/</span>
-          <span className="text-zinc-800 capitalize">{slug}</span>
-        </nav>
+              {/* Sort Bar */}
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white px-5 py-3 border border-zinc-100">
+                <p className="text-sm text-zinc-600">
+                  Showing <span className="font-semibold text-zinc-900">{filtered.length}</span> products
+                </p>
+                <Select
+                  defaultValue="popular"
+                  onChange={(e) => {
+                    setSortKey(e.target.value as SortKey)
+                    resetPage()
+                  }}
+                >
+                  <option value="popular">Sort: Most Popular</option>
+                  <option value="rating">Sort: Top Rated</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                </Select>
+              </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-zinc-600">
-            Showing <span className="font-semibold">1–{filtered.length}</span> of{" "}
-            <span className="font-semibold">{filtered.length}</span> products
-          </p>
-          <Select defaultValue="popular">
-            <option value="popular">Sort by: Most Popular</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-          </Select>
+              {/* Empty State */}
+              {filtered.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-28 text-center">
+                  <div className="text-6xl mb-4">🪷</div>
+                  <p className="text-lg font-semibold text-zinc-700">No products found</p>
+                  <p className="mt-1 text-sm text-zinc-400">Try adjusting or clearing your filters</p>
+                  <button
+                    onClick={() => {
+                      setSelectedColors([])
+                      setSelectedSizes([])
+                      setPriceRange([0, 20000])
+                      setSelectedCategory("all")
+                      resetPage()
+                    }}
+                    className="mt-4 rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-800 transition-colors"
+                  >
+                    Reset All Filters
+                  </button>
+                </div>
+              ) : (
+                <div className="grid gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                  {paginatedProducts.map((product) => {
+                    const discount =
+                      product.originalPrice && product.originalPrice > product.price
+                        ? Math.round(
+                          ((product.originalPrice - product.price) / product.originalPrice) * 100
+                        )
+                        : null
+                    const isInCart = addedToCart === product.id
+
+                    return (
+                      <div
+                        key={product.id}
+                        className="group relative flex flex-col rounded-2xl bg-transparent transition-all duration-300 border border-transparent hover:border-zinc-100"
+                      >
+                        {/* Product Image */}
+                        <Link
+                          to={`/product/${product.id}`}
+                          className="relative block overflow-hidden rounded-t-2xl bg-white aspect-3/4"
+                        >
+                          <img
+                            src={typeof product.image === "string" ? product.image : product.image}
+                            alt={product.name}
+                            className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                            onError={(e) => {
+                              const t = e.target as HTMLImageElement
+                              t.src = `https://placehold.co/400x560/F5F0EA/9B7B5E?text=${encodeURIComponent(product.name)}`
+                            }}
+                          />
+
+                          {/* Badges */}
+                          <div className="absolute left-3 top-3 flex flex-col gap-1.5">
+                            {product.tags?.includes("new") && (
+                              <span className="rounded-full bg-zinc-900 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white shadow">
+                                New
+                              </span>
+                            )}
+                            {discount && (
+                              <span className="rounded-full bg-red-500 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white shadow">
+                                -{discount}%
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Wishlist */}
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              toggleWishlist(product.id)
+                            }}
+                            className={`absolute right-3 top-3 rounded-full p-2 backdrop-blur-sm transition-all duration-200 hover:scale-110 ${isInWishlist(product.id)
+                              ? "bg-red-50 opacity-100"
+                              : "bg-white/80 opacity-0 group-hover:opacity-100"
+                              }`}
+                            aria-label="Wishlist"
+                          >
+                            <Heart
+                              className={`h-4 w-4 transition-colors ${isInWishlist(product.id)
+                                ? "fill-red-500 text-red-500"
+                                : "text-zinc-500"
+                                }`}
+                            />
+                          </button>
+
+                        </Link>
+
+                        {/* Product Info */}
+                        <div className="flex flex-col gap-1.5 p-3.5">
+                          <Link
+                            to={`/product/${product.id}`}
+                            className="line-clamp-2 text-[13px] font-semibold leading-snug text-zinc-900 hover:underline"
+                          >
+                            {product.name}
+                          </Link>
+
+                          {/* Rating */}
+                          <div className="flex items-center gap-1">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`h-3 w-3 ${i < Math.round(product.rating)
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-zinc-200 fill-zinc-200"
+                                  }`}
+                              />
+                            ))}
+                            <span className="ml-1 text-[11px] font-semibold text-zinc-700">
+                              {product.rating.toFixed(1)}
+                            </span>
+                            <span className="text-[11px] text-zinc-400">
+                              ({product.reviews})
+                            </span>
+                          </div>
+
+                          {/* Price & Cart */}
+                          <div className="flex items-center justify-between gap-2 pt-1">
+                            <div className="flex flex-col">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[15px] font-bold text-zinc-900">
+                                  ₹{product.price.toLocaleString("en-IN")}
+                                </span>
+                                {discount && (
+                                  <span className="text-[10px] font-bold text-red-500">
+                                    -{discount}%
+                                  </span>
+                                )}
+                              </div>
+                              {product.originalPrice && (
+                                <span className="text-[11px] text-zinc-400 line-through">
+                                  ₹{product.originalPrice.toLocaleString("en-IN")}
+                                </span>
+                              )}
+                            </div>
+
+                            <button
+                              onClick={(e) => handleAddToCart(e, product)}
+                              className={`flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 ${isInCart
+                                ? "bg-green-600 text-white"
+                                : "bg-zinc-100 text-zinc-900 hover:bg-zinc-900 hover:text-white"
+                                }`}
+                              title="Add to Cart"
+                            >
+                              <ShoppingCart className="h-4 w-4" />
+                            </button>
+                          </div>
+
+                          {/* Color swatches */}
+                          <div className="flex gap-1.5 pt-1">
+                            {product.colors.slice(0, 5).map((color) => (
+                              <span
+                                key={color}
+                                className="h-3.5 w-3.5 rounded-full border border-zinc-200/50"
+                                style={{ backgroundColor: color }}
+                                title={color}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              <Pagination
+                page={safePage}
+                totalPages={totalPages}
+                onPageChange={(p) => {
+                  setCurrentPage(p)
+                  window.scrollTo({ top: 0, behavior: "smooth" })
+                }}
+              />
+            </section>
+          </div>
         </div>
-
-        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
-          {filtered.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-
-        <Pagination page={1} totalPages={3} />
-      </section>
+      </div>
     </div>
   )
 }
-
