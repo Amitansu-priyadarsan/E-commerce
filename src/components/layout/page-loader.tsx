@@ -3,8 +3,8 @@ import cartAnimation from '@/assets/Add to Cart Button.lottie';
 
 const PageLoader = () => {
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white/90 backdrop-blur-sm">
-            <div className="w-[120px] h-[120px]">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white">
+            <div className="w-[300px] h-[300px]">
                 <DotLottieReact
                     src={cartAnimation}
                     loop
