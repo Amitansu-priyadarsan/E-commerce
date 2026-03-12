@@ -40,7 +40,7 @@ export function Navbar() {
           </button>
 
           <Link to="/" className="shrink-0 flex items-center">
-            <img src={logoImg} alt="Shop.co Logo" className="h-[36px] sm:h-[45px] md:h-[50px] w-auto drop-shadow-sm" />
+            <img src={logoImg} alt="Shop.co Logo" className="h-[36px] sm:h-[45px] md:h-[50px] w-auto " />
           </Link>
         </div>
 

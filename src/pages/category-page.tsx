@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom"
 import { Settings2, ShoppingCart, Heart, SlidersHorizontal, X } from "lucide-react"
 import { products } from "@/data/products"
 import { useCart } from "@/contexts/cart-context"
+import { useWishlist } from "@/contexts/wishlist-context"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
 import { PriceSlider } from "@/components/ui/slider"
 import { Select } from "@/components/ui/select"
@@ -41,17 +42,18 @@ type SortKey = "popular" | "price-low" | "price-high" | "rating"
 export function CategoryPage() {
   const { slug } = useParams<{ slug: string }>()
   const { addItem } = useCart()
+  const { toggleWishlist, isInWishlist } = useWishlist()
 
   // Use local selectedCategory state, initialized from URL slug
   const [selectedCategory, setSelectedCategory] = useState<string>(slug || "all")
   const [sortKey, setSortKey] = useState<SortKey>("popular")
-  const [wishlist, setWishlist] = useState<Set<string>>(new Set())
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 20000])
   const [selectedColors, setSelectedColors] = useState<string[]>([])
   const [selectedSizes, setSelectedSizes] = useState<string[]>([])
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [addedToCart, setAddedToCart] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
+  const [openAccordionSections, setOpenAccordionSections] = useState<string[]>(["category"])
 
   // Sync selectedCategory when URL slug changes (e.g., from navbar navigation)
   useEffect(() => {
@@ -59,16 +61,24 @@ export function CategoryPage() {
     setCurrentPage(1)
   }, [slug])
 
+  // Automatically expand accordion sections when filters become active
+  useEffect(() => {
+    setOpenAccordionSections(prev => {
+      const next = new Set(prev)
+      next.add("category") // Always keep category open/available
+
+      if (selectedColors.length > 0) next.add("color")
+      if (selectedSizes.length > 0) next.add("size")
+      if (priceRange[0] > 0 || priceRange[1] < 20000) next.add("price")
+
+      return Array.from(next)
+    })
+  }, [selectedColors.length, selectedSizes.length, priceRange])
+
   // Reset to page 1 when any filter changes
   const resetPage = useCallback(() => setCurrentPage(1), [])
 
-  const toggleWishlist = (id: string) => {
-    setWishlist((prev) => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
-  }
+
 
   const handleAddToCart = (e: React.MouseEvent, product: typeof products[0]) => {
     e.preventDefault()
@@ -145,7 +155,11 @@ export function CategoryPage() {
   // Check if any filter (besides category) is active
   const hasActiveFilters = selectedColors.length > 0 || selectedSizes.length > 0 || priceRange[0] > 0 || priceRange[1] < 20000
 
-  const FilterPanel = () => (
+  // Render filter panel as inline JSX (NOT a component function).
+  // Defining this as `const FilterPanel = () => (...)` would create
+  // a NEW component type on every render, causing React to unmount
+  // and remount the entire panel (resetting accordion open state).
+  const filterPanelContent = (
     <div className="space-y-1">
       <div className="mb-5 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-zinc-800">
@@ -158,6 +172,7 @@ export function CategoryPage() {
               setSelectedColors([])
               setSelectedSizes([])
               setPriceRange([0, 20000])
+              setOpenAccordionSections(["category"])
               resetPage()
             }}
             className="text-[11px] font-medium text-red-500 hover:text-red-700 transition-colors"
@@ -167,7 +182,10 @@ export function CategoryPage() {
         )}
       </div>
 
-      <Accordion defaultValue="category">
+      <Accordion
+        value={openAccordionSections}
+        onValueChange={setOpenAccordionSections}
+      >
         <AccordionItem value="category">
           <AccordionTrigger>Category</AccordionTrigger>
           <AccordionContent>
@@ -196,10 +214,6 @@ export function CategoryPage() {
           <AccordionTrigger>Price Range</AccordionTrigger>
           <AccordionContent>
             <PriceSlider min={0} max={20000} values={priceRange} onChange={handlePriceChange} />
-            <div className="mt-3 flex justify-between text-xs font-medium text-zinc-700">
-              <span>₹{priceRange[0].toLocaleString("en-IN")}</span>
-              <span>₹{priceRange[1].toLocaleString("en-IN")}</span>
-            </div>
           </AccordionContent>
         </AccordionItem>
 
@@ -256,7 +270,7 @@ export function CategoryPage() {
             {/* ── Desktop Sidebar ──────────────────────────────── */}
             <aside className="hidden lg:block w-[300px] shrink-0">
               <div className="sticky top-24 rounded-2xl bg-white p-6 border border-zinc-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-                <FilterPanel />
+                {filterPanelContent}
               </div>
             </aside>
 
@@ -278,7 +292,7 @@ export function CategoryPage() {
                       <X className="h-4 w-4 text-zinc-600" />
                     </button>
                   </div>
-                  <FilterPanel />
+                  {filterPanelContent}
                 </div>
               </div>
             )}
@@ -405,7 +419,7 @@ export function CategoryPage() {
                         {/* Product Image */}
                         <Link
                           to={`/product/${product.id}`}
-                          className="relative block overflow-hidden rounded-t-2xl bg-white aspect-[3/4]"
+                          className="relative block overflow-hidden rounded-t-2xl bg-white aspect-3/4"
                         >
                           <img
                             src={typeof product.image === "string" ? product.image : product.image}
@@ -438,14 +452,14 @@ export function CategoryPage() {
                               e.stopPropagation()
                               toggleWishlist(product.id)
                             }}
-                            className={`absolute right-3 top-3 rounded-full p-2 backdrop-blur-sm transition-all duration-200 hover:scale-110 ${wishlist.has(product.id)
+                            className={`absolute right-3 top-3 rounded-full p-2 backdrop-blur-sm transition-all duration-200 hover:scale-110 ${isInWishlist(product.id)
                               ? "bg-red-50 opacity-100"
                               : "bg-white/80 opacity-0 group-hover:opacity-100"
                               }`}
                             aria-label="Wishlist"
                           >
                             <Heart
-                              className={`h-4 w-4 transition-colors ${wishlist.has(product.id)
+                              className={`h-4 w-4 transition-colors ${isInWishlist(product.id)
                                 ? "fill-red-500 text-red-500"
                                 : "text-zinc-500"
                                 }`}
