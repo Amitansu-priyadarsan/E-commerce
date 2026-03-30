@@ -33,6 +33,8 @@ const CATEGORIES = [
   { value: "salwar", label: "Salwar Suits" },
   { value: "anarkali", label: "Anarkalis" },
   { value: "pashtuni", label: "Pashtuni Poshak" },
+  { value: "cotton", label: "Cotton" },
+  { value: "linen", label: "Linen" },
 ]
 
 const ITEMS_PER_PAGE = 12

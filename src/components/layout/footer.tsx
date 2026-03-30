@@ -20,7 +20,7 @@ export function Footer() {
         {/* Logo Section */}
         <div className="flex flex-col items-start lg:w-1/4">
           <div className="bg-white rounded-xl shadow-md p-4 flex items-center justify-center -rotate-2 transform hover:rotate-0 transition-transform duration-300">
-            <img src={Logo} alt="Bahurani Saree" className="h-14 lg:h-16 w-auto object-contain" />
+            <img src={Logo} alt="Pehnava" className="h-14 lg:h-16 w-auto object-contain" />
           </div>
         </div>
 
@@ -54,19 +54,19 @@ export function Footer() {
             <li>
               <a href="#" className="flex items-center gap-3 hover:text-red-700 transition-colors">
                 <Facebook className="h-5 w-5 text-red-600" />
-                <span>@pehnavaethinics.in</span>
+                <span>@pehnava.in</span>
               </a>
             </li>
             <li>
               <a href="#" className="flex items-center gap-3 hover:text-red-700 transition-colors">
                 <Instagram className="h-5 w-5 text-red-600" />
-                <span>pehnavaethinics.in</span>
+                <span>pehnava.in</span>
               </a>
             </li>
             <li>
               <a href="#" className="flex items-center gap-3 hover:text-red-700 transition-colors">
                 <Youtube className="h-5 w-5 text-red-600" />
-                <span>pehnavaethinics.in</span>
+                <span>pehnava.in</span>
               </a>
             </li>
           </ul>

@@ -2,8 +2,8 @@ import { useNavigate } from "react-router-dom"
 import ChanderiSaree from "@/assets/Hero/ChanderiSaree.png"
 import MaheshwariSaree from "@/assets/Hero/Maheswari.png"
 import KanchipuramSaree from "@/assets/Hero/Kanchipuram.png"
-import BanarasiSaree from "@/assets/Hero/Banarasi.png"
-import RajputiSaree from "@/assets/Hero/Rajputi.png"
+import CottonSpecialty from "@/assets/Saree/Saree3.png"
+import LinenSpecialty from "@/assets/Saree/Saree4.png"
 import PoshakImage from "@/assets/Hero/Poshak.png"
 import IndoWesternImage from "@/assets/Hero/Indowestern.png"
 import LehengaImage from "@/assets/Hero/Lehenga.png"
@@ -11,11 +11,11 @@ import Lehenga2Image from "@/assets/Hero/Lehenga2.png"
 import { HeartIcon } from "@/components/home/heart-icon"
 
 const specialties = [
-  { id: "saree", name: "Chanderi Saree", image: ChanderiSaree },
-  { id: "saree", name: "Maheshwari Saree", image: MaheshwariSaree },
-  { id: "saree", name: "Kanchipuram Saree", image: KanchipuramSaree },
-  { id: "saree", name: "Banarasi Saree", image: BanarasiSaree },
-  { id: "saree", name: "Rajputi Saree", image: RajputiSaree },
+  { slug: "saree", name: "Chanderi Saree", image: ChanderiSaree },
+  { slug: "saree", name: "Maheshwari Saree", image: MaheshwariSaree },
+  { slug: "saree", name: "Kanchipuram Saree", image: KanchipuramSaree },
+  { slug: "cotton", name: "Cotton", image: CottonSpecialty },
+  { slug: "linen", name: "Linen", image: LinenSpecialty },
 ]
 
 const productTypes = [
@@ -59,13 +59,13 @@ export function BrandMarquee() {
       </div>
 
       <div className="mt-12 w-full max-w-7xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-5 pb-10 justify-items-center">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-5 pb-10 justify-items-center">
           {specialties.map((item) => (
             <div
-              key={item.id}
+              key={item.name}
               className="group relative cursor-pointer w-full rounded-lg overflow-hidden"
               onClick={() => {
-                navigate(`/category/${item.id}`)
+                navigate(`/category/${item.slug}`)
               }}
             >
               <div className="aspect-4/5 w-full overflow-hidden bg-zinc-100">
@@ -89,11 +89,11 @@ export function BrandMarquee() {
       </div>
       <div className="mt-20 w-full flex flex-col items-center justify-center text-center">
         <div style={{ color: "#AE2534", fontSize: "36px", fontFamily: "Joan", fontWeight: 400, wordWrap: "break-word" }}>
-          Fashion Moment With Pehnava Ethinics
+          Fashion Moment With Pehnava
         </div>
         <HeartIcon className="my-4" />
         <div style={{ color: "black", fontSize: "36px", fontFamily: "Joan", fontWeight: 400, wordWrap: "break-word" }}>
-          Our Customers` satisfaction matters us the<br />   most
+          Our Customers&apos; satisfaction matters to us the<br />   most
         </div>
       </div>
 

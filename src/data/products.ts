@@ -11,7 +11,7 @@ import Saree4 from "@/assets/Saree/Saree4.png"
 export type Product = {
   id: string
   name: string
-  category: "kurtis" | "saree" | "lehenga" | "salwar" | "anarkali" | "pashtuni"
+  category: "kurtis" | "saree" | "lehenga" | "salwar" | "anarkali" | "pashtuni" | "cotton" | "linen"
   price: number
   originalPrice?: number
   rating: number
@@ -319,6 +319,122 @@ export const products: Product[] = [
     colors: ["#FF6B35", "#9B59B6", "#FFD700"],
     sizes: ["S", "M", "L", "XL"],
     tags: ["top", "celebration"],
+  },
+
+  // ─── COTTON COLLECTION ───────────────────────────────────────────────────────
+  {
+    id: "cotton-handloom-saree-blush",
+    name: "Handloom Pure Cotton Saree",
+    category: "cotton",
+    price: 1899,
+    originalPrice: 2599,
+    rating: 4.8,
+    reviews: 412,
+    image:
+      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop&q=80",
+    colors: ["#E8B4B8", "#FFFFFF", "#2D5016"],
+    sizes: ["Free Size"],
+    tags: ["new", "breathable"],
+  },
+  {
+    id: "cotton-block-print-kurti",
+    name: "Jaipuri Block Print Cotton Kurti",
+    category: "cotton",
+    price: 999,
+    originalPrice: 1499,
+    rating: 4.6,
+    reviews: 267,
+    image:
+      "https://images.unsplash.com/photo-1583391733981-8498408ee4b6?w=800&auto=format&fit=crop&q=80",
+    colors: ["#1E3A5F", "#FFD700", "#C0392B"],
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    tags: ["daily-wear", "summer"],
+  },
+  {
+    id: "cotton-salwar-dupatta-set",
+    name: "Cotton Salwar with Chiffon Dupatta",
+    category: "cotton",
+    price: 2199,
+    originalPrice: 2999,
+    rating: 4.7,
+    reviews: 198,
+    image:
+      "https://images.unsplash.com/photo-1594938298603-c8148c4b4d7e?w=800&auto=format&fit=crop&q=80",
+    colors: ["#9B59B6", "#FFFFFF", "#FF69B4"],
+    sizes: ["S", "M", "L", "XL"],
+    tags: ["office", "comfort"],
+  },
+  {
+    id: "cotton-embroidered-anarkali",
+    name: "Embroidered Cotton Anarkali",
+    category: "cotton",
+    price: 2799,
+    originalPrice: 3799,
+    rating: 4.9,
+    reviews: 156,
+    image:
+      "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=800&auto=format&fit=crop&q=80",
+    colors: ["#FF6B35", "#FFD700", "#8B0000"],
+    sizes: ["S", "M", "L", "XL"],
+    tags: ["festive", "featured"],
+  },
+
+  // ─── LINEN COLLECTION ────────────────────────────────────────────────────────
+  {
+    id: "linen-fusion-kurta-set",
+    name: "Linen Fusion Kurta with Palazzo",
+    category: "linen",
+    price: 2499,
+    originalPrice: 3299,
+    rating: 4.8,
+    reviews: 223,
+    image:
+      "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=800&auto=format&fit=crop&q=80",
+    colors: ["#2F4F4F", "#F5F5DC", "#8B4513"],
+    sizes: ["S", "M", "L", "XL"],
+    tags: ["new", "minimal"],
+  },
+  {
+    id: "linen-saree-pastel",
+    name: "Pastel Linen Blend Saree",
+    category: "linen",
+    price: 3299,
+    originalPrice: 4499,
+    rating: 4.7,
+    reviews: 134,
+    image:
+      "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&auto=format&fit=crop&q=80",
+    colors: ["#B8C5D6", "#E8D5C4", "#6B7C8F"],
+    sizes: ["Free Size"],
+    tags: ["elegant", "lightweight"],
+  },
+  {
+    id: "linen-indo-western-coord",
+    name: "Linen Indo-Western Co-ord Set",
+    category: "linen",
+    price: 3999,
+    originalPrice: 5499,
+    rating: 4.9,
+    reviews: 89,
+    image:
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&auto=format&fit=crop&q=80",
+    colors: ["#36454F", "#FFD700", "#FFFFFF"],
+    sizes: ["XS", "S", "M", "L", "XL"],
+    tags: ["premium", "contemporary"],
+  },
+  {
+    id: "linen-dupatta-scarf-set",
+    name: "Handwoven Linen Dupatta Pair",
+    category: "linen",
+    price: 1299,
+    originalPrice: 1799,
+    rating: 4.5,
+    reviews: 312,
+    image:
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&auto=format&fit=crop&q=80",
+    colors: ["#D4C4A8", "#8B7355", "#F5F5DC"],
+    sizes: ["Free Size"],
+    tags: ["accessory", "layering"],
   },
 ]
 
