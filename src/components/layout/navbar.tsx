@@ -5,6 +5,7 @@ import logoImg from "@/assets/Navbar/logo.png"
 import { IoSearchOutline } from "react-icons/io5"
 import { FaHeart, FaUserCircle, FaShoppingCart } from "react-icons/fa"
 import { Menu, X } from "lucide-react"
+import { LoginModal } from "@/components/auth/login-modal"
 
 const CATEGORY_ITEMS = [
   "All",
@@ -24,10 +25,18 @@ export function Navbar() {
   const { items } = useCart()
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
+  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin")
+
+  const openLoginModal = (mode: "signin" | "signup") => {
+    setAuthMode(mode)
+    setIsLoginModalOpen(true)
+  }
 
   return (
-    <header className="bg-white flex flex-col font-sans relative">
-      {/* Top Navbar */}
+    <>
+      <header className="bg-white flex flex-col font-sans relative">
+        {/* Top Navbar */}
       <div className="mx-auto w-full max-w-[1440px] px-4 py-3 sm:py-4 sm:px-8 flex items-center justify-between gap-2 md:gap-4">
         {/* Mobile Hamburger & Logo */}
         <div className="flex items-center gap-2 md:gap-8">
@@ -62,9 +71,9 @@ export function Navbar() {
               <FaHeart className="h-[18px] w-[18px] sm:h-[22px] sm:w-[22px]" />
             </Link>
 
-            <Link to="/profile" aria-label="Profile" className="text-black hover:text-[#AE2534] transition-colors">
+            <button aria-label="Profile" onClick={() => openLoginModal("signin")} className="text-black hover:text-[#AE2534] transition-colors">
               <FaUserCircle className="h-[18px] w-[18px] sm:h-[22px] sm:w-[22px]" />
-            </Link>
+            </button>
 
             <Link to="/cart" aria-label="Cart" className="relative flex items-center text-black hover:text-[#AE2534] transition-colors">
               <FaShoppingCart className="h-[18px] w-[18px] sm:h-[22px] sm:w-[22px]" />
@@ -75,8 +84,8 @@ export function Navbar() {
           </div>
           {/* Desktop Only: Below Icons Texts */}
           <div className="hidden md:flex w-full justify-between px-2 mt-1 text-[11px] text-zinc-500 font-medium">
-            <Link to="/login" className="hover:text-black">Login</Link>
-            <Link to="/register" className="hover:text-black">Register</Link>
+            <button onClick={() => openLoginModal("signin")} className="hover:text-black">Login</button>
+            <button onClick={() => openLoginModal("signup")} className="hover:text-black">Register</button>
           </div>
         </div>
       </div>
@@ -180,20 +189,24 @@ export function Navbar() {
                 </div>
 
                 <div className="pt-6 border-t border-zinc-100 space-y-4">
-                  <Link
-                    to="/login"
-                    onClick={() => setIsMenuOpen(false)}
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      openLoginModal("signin");
+                    }}
                     className="flex h-11 w-full items-center justify-center rounded-lg border border-[#AE2534] text-[#AE2534] font-semibold hover:bg-zinc-50 transition-colors"
                   >
                     Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    onClick={() => setIsMenuOpen(false)}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      openLoginModal("signup");
+                    }}
                     className="flex h-11 w-full items-center justify-center rounded-lg bg-[#AE2534] text-white font-semibold hover:bg-[#8e1e2a] transition-colors"
                   >
                     Register
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>
@@ -205,5 +218,7 @@ export function Navbar() {
         </>
       )}
     </header>
+      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} authMode={authMode} />
+    </>
   )
 }
