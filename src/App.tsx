@@ -8,6 +8,9 @@ import { CartPage } from "@/pages/cart-page"
 import { ProfilePage } from "@/pages/profile-page"
 import { WishlistPage } from "@/pages/wishlist-page"
 import { ContactUsPage } from "@/pages/contact-us-page"
+import { OrdersPage } from "@/pages/orders-page"
+import { CheckoutPage } from "@/pages/checkout-page"
+import { OrderConfirmationPage } from "@/pages/order-confirmation-page"
 import PageLoader from "@/components/layout/page-loader"
 
 function ScrollToTopOnRouteChange() {
@@ -27,8 +30,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Skip loader for category pages
-    if (pathname.startsWith("/category")) {
+    // Skip loader for category, checkout, and order-confirmation pages
+    if (pathname.startsWith("/category") || pathname.startsWith("/checkout") || pathname.startsWith("/order-confirmation")) {
       setIsLoading(false)
       return
     }
@@ -53,6 +56,9 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/contact-us" element={<ContactUsPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order-confirmation/:orderId" element={<OrderConfirmationPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

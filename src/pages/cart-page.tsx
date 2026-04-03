@@ -1,5 +1,7 @@
 import { Trash2, ArrowRight } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import { useCart } from "@/contexts/cart-context"
+import { useAuth } from "@/contexts/auth-context"
 import { Card } from "@/components/ui/card"
 import { QuantitySelector } from "@/components/common/quantity-selector"
 import { Button } from "@/components/ui/button"
@@ -7,6 +9,8 @@ import { Input } from "@/components/ui/input"
 
 export function CartPage() {
   const { items, loading, subtotal, updateQuantity, removeItem } = useCart()
+  const { user } = useAuth()
+  const navigate = useNavigate()
 
   const discount = subtotal > 200 ? subtotal * 0.1 : 0
   const delivery = subtotal > 0 ? 8 : 0
@@ -66,7 +70,7 @@ export function CartPage() {
                       onChange={(value) => updateQuantity(item.id, value)}
                     />
                     <div className="text-sm font-semibold text-zinc-900">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ₹{(item.price * item.quantity).toLocaleString()}
                     </div>
                   </div>
                 </div>
@@ -119,6 +123,7 @@ export function CartPage() {
           <Button
             className="mt-4 w-full rounded-full bg-black text-xs font-semibold uppercase tracking-[0.18em] text-white hover:bg-zinc-900"
             disabled={items.length === 0}
+            onClick={() => user ? navigate("/checkout") : navigate("/checkout")}
           >
             Checkout
             <ArrowRight className="ml-2 h-4 w-4" />
@@ -141,7 +146,7 @@ function LineItem({ label, value, className, classNameValue }: LineItemProps) {
     <div className={`flex items-center justify-between ${className ?? ""}`}>
       <span className="text-xs text-zinc-500">{label}</span>
       <span className={`text-sm text-zinc-900 ${classNameValue ?? ""}`}>
-        ${value.toFixed(2)}
+        ₹{value.toLocaleString()}
       </span>
     </div>
   )

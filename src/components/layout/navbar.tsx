@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/auth-context"
 import logoImg from "@/assets/Navbar/logo.png"
 import { IoSearchOutline } from "react-icons/io5"
 import { FaHeart, FaUserCircle, FaShoppingCart } from "react-icons/fa"
-import { Menu, X } from "lucide-react"
+import { Menu, X, Package } from "lucide-react"
 import { LoginModal } from "@/components/auth/login-modal"
 
 const CATEGORY_ITEMS = [
@@ -116,6 +116,13 @@ export function Navbar() {
                   >
                     <FaUserCircle className="h-4 w-4 shrink-0" />
                     My Profile
+                  </button>
+                  <button
+                    onClick={() => { setIsDropdownOpen(false); navigate("/orders") }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-zinc-700 hover:bg-zinc-50 hover:text-[#AE2534] transition-colors"
+                  >
+                    <Package className="h-4 w-4 shrink-0" />
+                    Your Orders
                   </button>
                 </div>
                 {/* Logout */}

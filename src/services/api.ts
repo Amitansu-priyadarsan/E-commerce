@@ -136,6 +136,32 @@ export const wishlistApi = {
 
 // ── Orders ────────────────────────────────────────────────────────────────────
 
+export type ApiOrderItem = {
+  id: string
+  product_id: string
+  quantity: number
+  selected_color?: string
+  selected_size?: string
+  price_at_purchase: number
+  products?: {
+    name: string
+    image_url: string
+    category: string
+  }
+}
+
+export type ApiOrder = {
+  id: string
+  user_id: string
+  status: "pending" | "confirmed" | "out_for_delivery" | "delivered"
+  subtotal: number
+  discount: number
+  delivery_fee: number
+  total: number
+  created_at: string
+  order_items: ApiOrderItem[]
+}
+
 export const ordersApi = {
   create(order: {
     user_id: string
@@ -154,8 +180,12 @@ export const ordersApi = {
     return api.post<{ order_id: string; status: string }>("/orders/", order)
   },
 
+  getOrder(orderId: string) {
+    return api.get<ApiOrder>(`/orders/${orderId}`)
+  },
+
   getUserOrders(userId: string) {
-    return api.get(`/orders/user/${userId}`)
+    return api.get<ApiOrder[]>(`/orders/user/${userId}`)
   },
 }
 

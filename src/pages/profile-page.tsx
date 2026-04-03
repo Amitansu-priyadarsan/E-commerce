@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { profileApi } from "@/services/api"
 import type { ApiProfile } from "@/services/api"
 import { FaUserCircle } from "react-icons/fa"
-import { Mail, Phone, Calendar, LogOut } from "lucide-react"
+import { Mail, Phone, Calendar, LogOut, Package } from "lucide-react"
 
 export function ProfilePage() {
   const { user, logout } = useAuth()
@@ -96,14 +96,23 @@ export function ProfilePage() {
                 )}
               </div>
 
-              {/* Logout */}
-              <button
-                onClick={() => { logout(); navigate("/") }}
-                className="mt-8 flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#AE2534] text-[#AE2534] text-sm font-semibold hover:bg-red-50 transition-colors"
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </button>
+              {/* Actions */}
+              <div className="mt-8 flex flex-col sm:flex-row items-center gap-3 w-full max-w-xs">
+                <button
+                  onClick={() => navigate("/orders")}
+                  className="flex w-full items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#AE2534] text-white text-sm font-semibold hover:bg-[#8e1e2a] transition-colors"
+                >
+                  <Package className="h-4 w-4" />
+                  Your Orders
+                </button>
+                <button
+                  onClick={() => { logout(); navigate("/") }}
+                  className="flex w-full items-center justify-center gap-2 px-6 py-2.5 rounded-full border border-[#AE2534] text-[#AE2534] text-sm font-semibold hover:bg-red-50 transition-colors"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </button>
+              </div>
             </div>
           </div>
         )}
