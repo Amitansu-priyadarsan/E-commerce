@@ -63,30 +63,64 @@ export function Navbar() {
           />
         </div>
 
-        {/* Right side icons & links */}
-        <div className="flex flex-col items-center">
-          {/* Icons container */}
-          <div className="flex items-center gap-3 sm:gap-5 rounded-full border border-zinc-200 bg-white px-3 py-1.5 sm:px-5 sm:py-2 shadow-[0px_2px_8px_rgba(0,0,0,0.1)] md:shadow-[0px_2px_8px_rgba(0,0,0,0.15)]">
-            <Link to="/wishlist" aria-label="Wishlist" className="text-black hover:text-[#AE2534] transition-colors">
-              <FaHeart className="h-[18px] w-[18px] sm:h-[22px] sm:w-[22px]" />
-            </Link>
+        {/* Right side actions */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Wishlist — icon only on mobile, icon+label on desktop */}
+          <Link
+            to="/wishlist"
+            aria-label="Wishlist"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full text-zinc-600 hover:text-[#AE2534] hover:bg-red-50 transition-colors"
+          >
+            <FaHeart className="h-[18px] w-[18px]" />
+            <span className="hidden md:inline text-[13px] font-medium">Wishlist</span>
+          </Link>
+          {/* Mobile wishlist icon only */}
+          <Link
+            to="/wishlist"
+            aria-label="Wishlist"
+            className="sm:hidden flex items-center justify-center p-2 rounded-full text-zinc-600 hover:text-[#AE2534] transition-colors"
+          >
+            <FaHeart className="h-[18px] w-[18px]" />
+          </Link>
 
-            <button aria-label="Profile" onClick={() => openLoginModal("signin")} className="text-black hover:text-[#AE2534] transition-colors">
-              <FaUserCircle className="h-[18px] w-[18px] sm:h-[22px] sm:w-[22px]" />
+          {/* Auth buttons — desktop: Login + Register, mobile: user icon */}
+          <div className="hidden sm:flex items-center gap-2">
+            <button
+              onClick={() => openLoginModal("signin")}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-full border border-zinc-300 text-zinc-700 text-[13px] font-medium hover:border-[#AE2534] hover:text-[#AE2534] transition-colors"
+            >
+              <FaUserCircle className="h-[15px] w-[15px]" />
+              <span>Login</span>
             </button>
+            <button
+              onClick={() => openLoginModal("signup")}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-[#AE2534] text-white text-[13px] font-medium hover:bg-[#8e1e2a] transition-colors"
+            >
+              <span>Register</span>
+            </button>
+          </div>
+          {/* Mobile: user icon triggers login */}
+          <button
+            aria-label="Account"
+            onClick={() => openLoginModal("signin")}
+            className="sm:hidden flex items-center justify-center p-2 rounded-full text-zinc-600 hover:text-[#AE2534] transition-colors"
+          >
+            <FaUserCircle className="h-[20px] w-[20px]" />
+          </button>
 
-            <Link to="/cart" aria-label="Cart" className="relative flex items-center text-black hover:text-[#AE2534] transition-colors">
-              <FaShoppingCart className="h-[18px] w-[18px] sm:h-[22px] sm:w-[22px]" />
-              <span className="absolute -top-[10px] sm:-top-[12px] -right-[10px] sm:-right-[12px] flex h-[16px] w-[16px] sm:h-[20px] sm:w-[20px] items-center justify-center font-bold text-[9px] sm:text-[12px] text-black bg-white rounded-full shadow-sm sm:shadow-md">
+          {/* Cart */}
+          <Link
+            to="/cart"
+            aria-label="Cart"
+            className="relative flex items-center gap-1.5 px-3 py-2 rounded-full border border-zinc-200 bg-white shadow-sm text-zinc-700 hover:border-[#AE2534] hover:text-[#AE2534] transition-colors"
+          >
+            <FaShoppingCart className="h-[18px] w-[18px]" />
+            {cartCount > 0 && (
+              <span className="flex h-[18px] min-w-[18px] items-center justify-center font-bold text-[10px] text-white bg-[#AE2534] rounded-full px-1">
                 {cartCount}
               </span>
-            </Link>
-          </div>
-          {/* Desktop Only: Below Icons Texts */}
-          <div className="hidden md:flex w-full justify-between px-2 mt-1 text-[11px] text-zinc-500 font-medium">
-            <button onClick={() => openLoginModal("signin")} className="hover:text-black">Login</button>
-            <button onClick={() => openLoginModal("signup")} className="hover:text-black">Register</button>
-          </div>
+            )}
+          </Link>
         </div>
       </div>
 
