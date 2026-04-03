@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Link, NavLink } from "react-router-dom"
 import { useCart } from "@/contexts/cart-context"
+import { useAuth } from "@/contexts/auth-context"
 import logoImg from "@/assets/Navbar/logo.png"
 import { IoSearchOutline } from "react-icons/io5"
 import { FaHeart, FaUserCircle, FaShoppingCart } from "react-icons/fa"
@@ -23,6 +24,7 @@ const LINK_ITEMS = [
 
 export function Navbar() {
   const { items } = useCart()
+  const { user, logout } = useAuth()
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
@@ -83,29 +85,46 @@ export function Navbar() {
             <FaHeart className="h-[18px] w-[18px]" />
           </Link>
 
-          {/* Auth buttons — desktop: Login + Register, mobile: user icon */}
+          {/* Auth buttons — desktop */}
           <div className="hidden sm:flex items-center gap-2">
-            <button
-              onClick={() => openLoginModal("signin")}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-full border border-zinc-300 text-zinc-700 text-[13px] font-medium hover:border-[#AE2534] hover:text-[#AE2534] transition-colors"
-            >
-              <FaUserCircle className="h-[15px] w-[15px]" />
-              <span>Login</span>
-            </button>
-            <button
-              onClick={() => openLoginModal("signup")}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-[#AE2534] text-white text-[13px] font-medium hover:bg-[#8e1e2a] transition-colors"
-            >
-              <span>Register</span>
-            </button>
+            {user ? (
+              <>
+                <span className="flex items-center gap-1.5 px-3 py-2 text-[13px] font-medium text-zinc-700">
+                  <FaUserCircle className="h-[15px] w-[15px] text-[#AE2534]" />
+                  {user.full_name ?? user.email}
+                </span>
+                <button
+                  onClick={logout}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-full border border-zinc-300 text-zinc-700 text-[13px] font-medium hover:border-[#AE2534] hover:text-[#AE2534] transition-colors"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => openLoginModal("signin")}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-full border border-zinc-300 text-zinc-700 text-[13px] font-medium hover:border-[#AE2534] hover:text-[#AE2534] transition-colors"
+                >
+                  <FaUserCircle className="h-[15px] w-[15px]" />
+                  <span>Login</span>
+                </button>
+                <button
+                  onClick={() => openLoginModal("signup")}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-[#AE2534] text-white text-[13px] font-medium hover:bg-[#8e1e2a] transition-colors"
+                >
+                  <span>Register</span>
+                </button>
+              </>
+            )}
           </div>
-          {/* Mobile: user icon triggers login */}
+          {/* Mobile: user icon triggers login or shows logged-in state */}
           <button
             aria-label="Account"
-            onClick={() => openLoginModal("signin")}
+            onClick={() => user ? logout() : openLoginModal("signin")}
             className="sm:hidden flex items-center justify-center p-2 rounded-full text-zinc-600 hover:text-[#AE2534] transition-colors"
           >
-            <FaUserCircle className="h-[20px] w-[20px]" />
+            <FaUserCircle className={`h-[20px] w-[20px] ${user ? "text-[#AE2534]" : ""}`} />
           </button>
 
           {/* Cart */}
@@ -223,24 +242,35 @@ export function Navbar() {
                 </div>
 
                 <div className="pt-6 border-t border-zinc-100 space-y-4">
-                  <button
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      openLoginModal("signin");
-                    }}
-                    className="flex h-11 w-full items-center justify-center rounded-lg border border-[#AE2534] text-[#AE2534] font-semibold hover:bg-zinc-50 transition-colors"
-                  >
-                    Login
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      openLoginModal("signup");
-                    }}
-                    className="flex h-11 w-full items-center justify-center rounded-lg bg-[#AE2534] text-white font-semibold hover:bg-[#8e1e2a] transition-colors"
-                  >
-                    Register
-                  </button>
+                  {user ? (
+                    <>
+                      <div className="flex items-center gap-2 text-sm text-zinc-700 font-medium">
+                        <FaUserCircle className="h-4 w-4 text-[#AE2534]" />
+                        {user.full_name ?? user.email}
+                      </div>
+                      <button
+                        onClick={() => { setIsMenuOpen(false); logout() }}
+                        className="flex h-11 w-full items-center justify-center rounded-lg border border-[#AE2534] text-[#AE2534] font-semibold hover:bg-zinc-50 transition-colors"
+                      >
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => { setIsMenuOpen(false); openLoginModal("signin") }}
+                        className="flex h-11 w-full items-center justify-center rounded-lg border border-[#AE2534] text-[#AE2534] font-semibold hover:bg-zinc-50 transition-colors"
+                      >
+                        Login
+                      </button>
+                      <button
+                        onClick={() => { setIsMenuOpen(false); openLoginModal("signup") }}
+                        className="flex h-11 w-full items-center justify-center rounded-lg bg-[#AE2534] text-white font-semibold hover:bg-[#8e1e2a] transition-colors"
+                      >
+                        Register
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
