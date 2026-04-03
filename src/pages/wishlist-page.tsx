@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card"
 import { Link } from "react-router-dom"
 import { useWishlist } from "@/contexts/wishlist-context"
-import { products } from "@/data/products"
+import { products as localProducts } from "@/data/products"
 import { Star, ShoppingCart, Heart, Trash2 } from "lucide-react"
 import { useCart } from "@/contexts/cart-context"
 
@@ -9,7 +9,13 @@ export function WishlistPage() {
     const { wishlist, toggleWishlist } = useWishlist()
     const { addItem } = useCart()
 
-    const wishlistItems = products.filter(p => wishlist.includes(p.id))
+    // Match wishlist IDs against local product data (API products sync via category page)
+    const wishlistItems = localProducts
+        .filter(p => wishlist.includes(p.id))
+        .map(p => ({
+            ...p,
+            image: typeof p.image === "string" ? p.image : "",
+        }))
 
     if (wishlistItems.length === 0) {
         return (

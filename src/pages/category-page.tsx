@@ -127,7 +127,7 @@ export function CategoryPage() {
     resetPage()
   }
 
-  // Filter products using local selectedCategory state
+  // Filter products
   let filtered = products.filter((p) => {
     const matchCategory = selectedCategory === "all" || p.category === selectedCategory
     const matchPrice = p.price >= priceRange[0] && p.price <= priceRange[1]
@@ -424,7 +424,7 @@ export function CategoryPage() {
                           className="relative block overflow-hidden rounded-t-2xl bg-white aspect-3/4"
                         >
                           <img
-                            src={typeof product.image === "string" ? product.image : product.image}
+                            src={product.image}
                             alt={product.name}
                             className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                             onError={(e) => {

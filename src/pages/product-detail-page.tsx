@@ -281,7 +281,7 @@ function ImageGallery({ image }: ImageGalleryProps) {
         ))}
       </div>
       <Card className="overflow-hidden rounded-[20px] border-none bg-white p-0">
-        <div className="aspect-[4/5] w-full">
+        <div className="aspect-4/5 w-full">
           <img
             src={image}
             alt=""

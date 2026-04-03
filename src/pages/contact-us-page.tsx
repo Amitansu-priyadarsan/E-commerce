@@ -1,4 +1,27 @@
+import { useState } from "react"
+import { contactApi } from "@/services/api"
+
 export function ContactUsPage() {
+    const [name, setName] = useState("")
+    const [email, setEmail] = useState("")
+    const [message, setMessage] = useState("")
+    const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!name.trim() || !email.trim() || !message.trim()) return
+        setStatus("loading")
+        try {
+            await contactApi.send({ name, email, message })
+            setStatus("success")
+            setName("")
+            setEmail("")
+            setMessage("")
+        } catch {
+            setStatus("error")
+        }
+    }
+
     return (
         <div className="container mx-auto px-4 py-16 sm:px-8 max-w-4xl">
             <div className="text-center mb-12">
@@ -49,14 +72,17 @@ export function ContactUsPage() {
 
                 {/* Contact Form */}
                 <div className="bg-white p-8 rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-zinc-100">
-                    <form className="space-y-6">
+                    <form className="space-y-6" onSubmit={handleSubmit}>
                         <div className="space-y-2">
                             <label htmlFor="name" className="text-sm font-medium text-zinc-900 block">Full Name</label>
                             <input
                                 type="text"
                                 id="name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
                                 className="w-full px-4 py-3 rounded-lg border border-zinc-200 bg-zinc-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-black/5"
                                 placeholder="John Doe"
+                                required
                             />
                         </div>
                         <div className="space-y-2">
@@ -64,8 +90,11 @@ export function ContactUsPage() {
                             <input
                                 type="email"
                                 id="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 className="w-full px-4 py-3 rounded-lg border border-zinc-200 bg-zinc-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-black/5"
                                 placeholder="john@example.com"
+                                required
                             />
                         </div>
                         <div className="space-y-2">
@@ -73,15 +102,25 @@ export function ContactUsPage() {
                             <textarea
                                 id="message"
                                 rows={4}
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
                                 className="w-full px-4 py-3 rounded-lg border border-zinc-200 bg-zinc-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-black/5 resize-none"
                                 placeholder="How can we help you today?"
+                                required
                             ></textarea>
                         </div>
+                        {status === "success" && (
+                            <p className="text-sm font-medium text-green-600">Message sent! We'll get back to you soon.</p>
+                        )}
+                        {status === "error" && (
+                            <p className="text-sm font-medium text-red-500">Something went wrong. Please try again.</p>
+                        )}
                         <button
-                            type="button"
-                            className="w-full bg-black text-white font-medium py-4 rounded-full hover:bg-zinc-800 transition-colors"
+                            type="submit"
+                            disabled={status === "loading"}
+                            className="w-full bg-black text-white font-medium py-4 rounded-full hover:bg-zinc-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                            Send Message
+                            {status === "loading" ? "Sending…" : "Send Message"}
                         </button>
                     </form>
                 </div>
