@@ -6,16 +6,19 @@ import App from "./App.tsx"
 import { CartProvider } from "./contexts/cart-context"
 import { WishlistProvider } from "./contexts/wishlist-context"
 import { AuthProvider } from "./contexts/auth-context"
+import { ToastProvider } from "./contexts/toast-context"
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <App />
-          </WishlistProvider>
-        </CartProvider>
+        <ToastProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <App />
+            </WishlistProvider>
+          </CartProvider>
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>

@@ -1,6 +1,7 @@
 import { Heart, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/contexts/cart-context"
+import { useToast } from "@/contexts/toast-context"
 import { useNavigate } from "react-router-dom"
 
 import CarnivalBanner from "@/assets/Hero/Carnival.png"
@@ -46,16 +47,18 @@ const mockProducts = [
 
 export function CarnivalSection() {
     const { addItem } = useCart()
+    const { showToast } = useToast()
     const navigate = useNavigate()
 
     const handleAddToCart = (product: typeof mockProducts[0]) => {
         addItem({
-            id: product.id,
+            productId: product.id,
             name: product.name,
             price: parseInt(product.price.replace(/,/g, "")),
             image: product.image,
             quantity: 1,
         })
+        showToast(`${product.name} added to cart`)
     }
 
     const handleBuyNow = (product: typeof mockProducts[0]) => {

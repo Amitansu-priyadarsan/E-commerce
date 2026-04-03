@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { Link, NavLink } from "react-router-dom"
+import { useState, useRef, useEffect } from "react"
+import { Link, NavLink, useNavigate } from "react-router-dom"
 import { useCart } from "@/contexts/cart-context"
 import { useAuth } from "@/contexts/auth-context"
 import logoImg from "@/assets/Navbar/logo.png"
@@ -25,15 +25,28 @@ const LINK_ITEMS = [
 export function Navbar() {
   const { items } = useCart()
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin")
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   const openLoginModal = (mode: "signin" | "signup") => {
     setAuthMode(mode)
     setIsLoginModalOpen(true)
   }
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsDropdownOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   return (
     <>
@@ -67,65 +80,57 @@ export function Navbar() {
 
         {/* Right side actions */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Wishlist — icon only on mobile, icon+label on desktop */}
+          {/* Wishlist */}
           <Link
             to="/wishlist"
             aria-label="Wishlist"
-            className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full text-zinc-600 hover:text-[#AE2534] hover:bg-red-50 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-full text-zinc-600 hover:text-[#AE2534] hover:bg-red-50 transition-colors"
           >
             <FaHeart className="h-[18px] w-[18px]" />
             <span className="hidden md:inline text-[13px] font-medium">Wishlist</span>
           </Link>
-          {/* Mobile wishlist icon only */}
-          <Link
-            to="/wishlist"
-            aria-label="Wishlist"
-            className="sm:hidden flex items-center justify-center p-2 rounded-full text-zinc-600 hover:text-[#AE2534] transition-colors"
-          >
-            <FaHeart className="h-[18px] w-[18px]" />
-          </Link>
 
-          {/* Auth buttons — desktop */}
-          <div className="hidden sm:flex items-center gap-2">
-            {user ? (
-              <>
-                <span className="flex items-center gap-1.5 px-3 py-2 text-[13px] font-medium text-zinc-700">
-                  <FaUserCircle className="h-[15px] w-[15px] text-[#AE2534]" />
-                  {user.full_name ?? user.email}
-                </span>
-                <button
-                  onClick={logout}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-full border border-zinc-300 text-zinc-700 text-[13px] font-medium hover:border-[#AE2534] hover:text-[#AE2534] transition-colors"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => openLoginModal("signin")}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-full border border-zinc-300 text-zinc-700 text-[13px] font-medium hover:border-[#AE2534] hover:text-[#AE2534] transition-colors"
-                >
-                  <FaUserCircle className="h-[15px] w-[15px]" />
-                  <span>Login</span>
-                </button>
-                <button
-                  onClick={() => openLoginModal("signup")}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-[#AE2534] text-white text-[13px] font-medium hover:bg-[#8e1e2a] transition-colors"
-                >
-                  <span>Register</span>
-                </button>
-              </>
+          {/* Profile icon — single button for both logged-in and logged-out */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              aria-label="Account"
+              onClick={() => user ? setIsDropdownOpen(o => !o) : openLoginModal("signin")}
+              className="flex items-center justify-center w-9 h-9 rounded-full border border-zinc-200 bg-white shadow-sm text-zinc-600 hover:text-[#AE2534] hover:border-[#AE2534] transition-colors"
+            >
+              <FaUserCircle className={`h-[20px] w-[20px] ${user ? "text-[#AE2534]" : ""}`} />
+            </button>
+
+            {/* Dropdown — only when logged in */}
+            {user && isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-zinc-100 overflow-hidden z-50">
+                {/* User info */}
+                <div className="px-4 py-3 border-b border-zinc-100">
+                  <p className="text-[13px] font-semibold text-zinc-800 truncate">{user.full_name ?? "My Account"}</p>
+                  <p className="text-[11px] text-zinc-400 truncate mt-0.5">{user.email}</p>
+                </div>
+                {/* Menu items */}
+                <div className="py-1.5">
+                  <button
+                    onClick={() => { setIsDropdownOpen(false); navigate("/profile") }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-zinc-700 hover:bg-zinc-50 hover:text-[#AE2534] transition-colors"
+                  >
+                    <FaUserCircle className="h-4 w-4 shrink-0" />
+                    My Profile
+                  </button>
+                </div>
+                {/* Logout */}
+                <div className="border-t border-zinc-100 py-1.5">
+                  <button
+                    onClick={() => { setIsDropdownOpen(false); logout() }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-zinc-700 hover:bg-red-50 hover:text-[#AE2534] transition-colors"
+                  >
+                    <X className="h-4 w-4 shrink-0" />
+                    Logout
+                  </button>
+                </div>
+              </div>
             )}
           </div>
-          {/* Mobile: user icon triggers login or shows logged-in state */}
-          <button
-            aria-label="Account"
-            onClick={() => user ? logout() : openLoginModal("signin")}
-            className="sm:hidden flex items-center justify-center p-2 rounded-full text-zinc-600 hover:text-[#AE2534] transition-colors"
-          >
-            <FaUserCircle className={`h-[20px] w-[20px] ${user ? "text-[#AE2534]" : ""}`} />
-          </button>
 
           {/* Cart */}
           <Link
@@ -241,16 +246,25 @@ export function Navbar() {
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-zinc-100 space-y-4">
+                <div className="pt-6 border-t border-zinc-100 space-y-3">
                   {user ? (
                     <>
-                      <div className="flex items-center gap-2 text-sm text-zinc-700 font-medium">
+                      <div className="flex items-center gap-2 px-1 text-sm text-zinc-700 font-medium">
                         <FaUserCircle className="h-4 w-4 text-[#AE2534]" />
-                        {user.full_name ?? user.email}
+                        <div>
+                          <p className="font-semibold text-zinc-800">{user.full_name ?? "My Account"}</p>
+                          <p className="text-[11px] text-zinc-400">{user.email}</p>
+                        </div>
                       </div>
                       <button
+                        onClick={() => { setIsMenuOpen(false); navigate("/profile") }}
+                        className="flex h-11 w-full items-center justify-center rounded-xl border border-zinc-200 text-zinc-700 font-semibold hover:border-[#AE2534] hover:text-[#AE2534] transition-colors"
+                      >
+                        My Profile
+                      </button>
+                      <button
                         onClick={() => { setIsMenuOpen(false); logout() }}
-                        className="flex h-11 w-full items-center justify-center rounded-lg border border-[#AE2534] text-[#AE2534] font-semibold hover:bg-zinc-50 transition-colors"
+                        className="flex h-11 w-full items-center justify-center rounded-xl border border-[#AE2534] text-[#AE2534] font-semibold hover:bg-red-50 transition-colors"
                       >
                         Logout
                       </button>
@@ -259,13 +273,13 @@ export function Navbar() {
                     <>
                       <button
                         onClick={() => { setIsMenuOpen(false); openLoginModal("signin") }}
-                        className="flex h-11 w-full items-center justify-center rounded-lg border border-[#AE2534] text-[#AE2534] font-semibold hover:bg-zinc-50 transition-colors"
+                        className="flex h-11 w-full items-center justify-center rounded-xl border border-[#AE2534] text-[#AE2534] font-semibold hover:bg-zinc-50 transition-colors"
                       >
                         Login
                       </button>
                       <button
                         onClick={() => { setIsMenuOpen(false); openLoginModal("signup") }}
-                        className="flex h-11 w-full items-center justify-center rounded-lg bg-[#AE2534] text-white font-semibold hover:bg-[#8e1e2a] transition-colors"
+                        className="flex h-11 w-full items-center justify-center rounded-xl bg-[#AE2534] text-white font-semibold hover:bg-[#8e1e2a] transition-colors"
                       >
                         Register
                       </button>

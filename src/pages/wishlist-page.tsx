@@ -4,10 +4,12 @@ import { useWishlist } from "@/contexts/wishlist-context"
 import { products as localProducts } from "@/data/products"
 import { Star, ShoppingCart, Heart, Trash2 } from "lucide-react"
 import { useCart } from "@/contexts/cart-context"
+import { useToast } from "@/contexts/toast-context"
 
 export function WishlistPage() {
     const { wishlist, toggleWishlist } = useWishlist()
     const { addItem } = useCart()
+    const { showToast } = useToast()
 
     // Match wishlist IDs against local product data (API products sync via category page)
     const wishlistItems = localProducts
@@ -111,13 +113,14 @@ export function WishlistPage() {
                                     <button
                                         onClick={() => {
                                             addItem({
-                                                id: product.id,
+                                                productId: product.id,
                                                 name: product.name,
                                                 price: product.price,
                                                 originalPrice: product.originalPrice,
                                                 image: product.image,
                                                 quantity: 1
                                             })
+                                            showToast(`${product.name} added to cart`)
                                         }}
                                         className="w-9 h-9 bg-zinc-900 text-white rounded-full flex items-center justify-center hover:bg-[#AE2534] transition-colors shadow-lg"
                                     >

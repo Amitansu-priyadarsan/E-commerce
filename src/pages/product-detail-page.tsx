@@ -8,6 +8,7 @@ import { QuantitySelector } from "@/components/common/quantity-selector"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { useCart } from "@/contexts/cart-context"
+import { useToast } from "@/contexts/toast-context"
 import { ReviewCard } from "@/components/common/review-card"
 
 export function ProductDetailPage() {
@@ -16,6 +17,7 @@ export function ProductDetailPage() {
   const stateProduct = location.state?.product as Product | undefined
   const product = stateProduct || products.find((p) => p.id === id)
   const { addItem } = useCart()
+  const { showToast } = useToast()
   const [color, setColor] = useState<string | undefined>(product?.colors[0])
   const [size, setSize] = useState<string | undefined>(product?.sizes[0])
   const [quantity, setQuantity] = useState(1)
@@ -72,7 +74,7 @@ export function ProductDetailPage() {
 
   const handleAddToCart = () => {
     addItem({
-      id: `${product.id}-${color}-${size}`,
+      productId: product.id,
       name: product.name,
       price: product.price,
       originalPrice: product.originalPrice,
@@ -81,6 +83,7 @@ export function ProductDetailPage() {
       size,
       quantity,
     })
+    showToast(`${product.name} added to cart`)
   }
 
   return (

@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom"
 import { Settings2, ShoppingCart, Heart, SlidersHorizontal, X } from "lucide-react"
 import { products } from "@/data/products"
 import { useCart } from "@/contexts/cart-context"
+import { useToast } from "@/contexts/toast-context"
 import { useWishlist } from "@/contexts/wishlist-context"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
 import { PriceSlider } from "@/components/ui/slider"
@@ -44,6 +45,7 @@ type SortKey = "popular" | "price-low" | "price-high" | "rating"
 export function CategoryPage() {
   const { slug } = useParams<{ slug: string }>()
   const { addItem } = useCart()
+  const { showToast } = useToast()
   const { toggleWishlist, isInWishlist } = useWishlist()
 
   // Use local selectedCategory state, initialized from URL slug
@@ -86,13 +88,14 @@ export function CategoryPage() {
     e.preventDefault()
     e.stopPropagation()
     addItem({
-      id: product.id,
+      productId: product.id,
       name: product.name,
       price: product.price,
       originalPrice: product.originalPrice,
       image: product.image,
       quantity: 1,
     })
+    showToast(`${product.name} added to cart`)
     setAddedToCart(product.id)
     setTimeout(() => setAddedToCart(null), 1500)
   }

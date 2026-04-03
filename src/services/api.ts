@@ -159,6 +159,25 @@ export const ordersApi = {
   },
 }
 
+// ── Profile ───────────────────────────────────────────────────────────────────
+
+export type ApiProfile = {
+  id: string
+  email: string
+  full_name: string | null
+  phone_number: string | null
+  created_at: string
+}
+
+export const profileApi = {
+  getMe() {
+    return api.get<ApiProfile>("/users/me")
+  },
+  update(data: { full_name?: string; phone_number?: string }) {
+    return api.patch<ApiProfile>("/users/me", data)
+  },
+}
+
 // ── Contact ───────────────────────────────────────────────────────────────────
 
 export const contactApi = {

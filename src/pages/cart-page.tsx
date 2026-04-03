@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 export function CartPage() {
-  const { items, subtotal, updateQuantity, removeItem } = useCart()
+  const { items, loading, subtotal, updateQuantity, removeItem } = useCart()
 
   const discount = subtotal > 200 ? subtotal * 0.1 : 0
   const delivery = subtotal > 0 ? 8 : 0
@@ -18,7 +18,11 @@ export function CartPage() {
         <h1 className="text-xl font-black uppercase tracking-[0.25em]">
           Cart
         </h1>
-        {items.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <div className="w-7 h-7 border-2 border-[#AE2534] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : items.length === 0 ? (
           <p className="text-sm text-zinc-600">
             Your cart is empty. Start building your fit from the homepage.
           </p>
