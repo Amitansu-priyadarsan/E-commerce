@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import Lottie from "lottie-react"
 import { ordersApi } from "@/services/api"
 import type { ApiOrder } from "@/services/api"
-import { CheckCircle2, Package, Truck, Home, Copy, ArrowLeft } from "lucide-react"
+import { CheckCircle2, Package, Truck, Home, ArrowLeft } from "lucide-react"
 import orderConfirmedAnimation from "@/assets/Animation/Order-Confirmed.json"
 
 // ── Status Steps ─────────────────────────────────────────────────────────────
@@ -26,8 +26,6 @@ export function OrderConfirmationPage() {
   const navigate = useNavigate()
   const [order, setOrder] = useState<ApiOrder | null>(null)
   const [loading, setLoading] = useState(true)
-  const [copied, setCopied] = useState(false)
-
   useEffect(() => {
     if (!orderId) return
     ordersApi
@@ -36,13 +34,6 @@ export function OrderConfirmationPage() {
       .catch(() => navigate("/", { replace: true }))
       .finally(() => setLoading(false))
   }, [orderId, navigate])
-
-  function copyOrderId() {
-    if (!orderId) return
-    navigator.clipboard.writeText(orderId)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
 
   function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString("en-IN", {

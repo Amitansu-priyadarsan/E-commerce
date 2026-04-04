@@ -262,7 +262,6 @@ function OrdersView({ orders, filter, onFilter, counts, total, onView }: {
       <div className="space-y-2">
         {orders.map((order) => {
           const c = STATUS_CFG[order.status as OrderStatus] || STATUS_CFG.pending
-          const Icon = c.icon
           const qty = order.order_items?.reduce((s, i) => s + i.quantity, 0) || 0
           return (
             <button key={order.id} onClick={() => onView(order.id)} className="w-full bg-white rounded-xl border border-slate-200/60 p-4 hover:shadow-md hover:border-slate-300/60 transition-all text-left group">
