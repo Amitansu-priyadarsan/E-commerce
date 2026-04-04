@@ -1,20 +1,44 @@
 import { Trash2, ArrowRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import { useState } from "react"
 import { useCart } from "@/contexts/cart-context"
 import { useAuth } from "@/contexts/auth-context"
 import { Card } from "@/components/ui/card"
 import { QuantitySelector } from "@/components/common/quantity-selector"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { LoginModal } from "@/components/auth/login-modal"
+import { AddressModal } from "@/components/auth/address-modal"
 
 export function CartPage() {
   const { items, loading, subtotal, updateQuantity, removeItem } = useCart()
   const { user } = useAuth()
   const navigate = useNavigate()
+  const [showLoginModal, setShowLoginModal] = useState(false)
+  const [showAddressModal, setShowAddressModal] = useState(false)
 
   const discount = subtotal > 200 ? subtotal * 0.1 : 0
   const delivery = subtotal > 0 ? 8 : 0
   const total = subtotal - discount + delivery
+
+  function handleCheckout() {
+    if (!user) {
+      setShowLoginModal(true)
+      return
+    }
+    // Always read from localStorage — React state may be stale after updateAddress
+    let freshUser = user
+    try {
+      const stored = localStorage.getItem("auth_user")
+      if (stored) freshUser = JSON.parse(stored)
+    } catch { /* fall back to context user */ }
+
+    if (!freshUser.address || !freshUser.city || !freshUser.pincode) {
+      setShowAddressModal(true)
+      return
+    }
+    navigate("/checkout")
+  }
 
   return (
     <div className="grid gap-8 py-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,0.9fr)] lg:min-h-[600px]">
@@ -123,13 +147,35 @@ export function CartPage() {
           <Button
             className="mt-4 w-full rounded-full bg-black text-xs font-semibold uppercase tracking-[0.18em] text-white hover:bg-zinc-900"
             disabled={items.length === 0}
-            onClick={() => user ? navigate("/checkout") : navigate("/checkout")}
+            onClick={handleCheckout}
           >
             Checkout
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Card>
       </aside>
+
+      {/* Login modal — after auth+address are done, go straight to checkout */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        authMode="signin"
+        onAuthComplete={() => {
+          setShowLoginModal(false)
+          navigate("/checkout")
+        }}
+      />
+
+      {/* Address modal — for already-logged-in users missing address */}
+      <AddressModal
+        isOpen={showAddressModal}
+        onClose={() => setShowAddressModal(false)}
+        onSaved={() => {
+          setShowAddressModal(false)
+          navigate("/checkout")
+        }}
+        required={true}
+      />
     </div>
   )
 }
@@ -151,4 +197,3 @@ function LineItem({ label, value, className, classNameValue }: LineItemProps) {
     </div>
   )
 }
-

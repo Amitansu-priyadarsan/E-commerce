@@ -12,18 +12,33 @@ export function CheckoutPage() {
   const navigate = useNavigate()
   const [done, setDone] = useState(false)
 
-  // Snapshot cart data on first render so clearCart() doesn't wipe it
+  // Snapshot cart data on first render so clearCart() doesn't wipe it.
+  // Read address directly from localStorage to avoid React state timing issues
+  // (updateAddress writes to localStorage synchronously before setting state).
   const snapshotRef = useRef<{
     items: typeof items
     subtotal: number
     userId: string
+    address: string | null
+    city: string | null
+    pincode: string | null
   } | null>(null)
 
   if (!snapshotRef.current && items.length > 0 && user) {
+    // Always read the freshest user data from localStorage
+    let freshUser = user
+    try {
+      const stored = localStorage.getItem("auth_user")
+      if (stored) freshUser = JSON.parse(stored)
+    } catch { /* fall back to context user */ }
+
     snapshotRef.current = {
       items: [...items],
       subtotal,
-      userId: user.user_id,
+      userId: freshUser.user_id,
+      address: freshUser.address,
+      city: freshUser.city,
+      pincode: freshUser.pincode,
     }
   }
 
@@ -31,7 +46,11 @@ export function CheckoutPage() {
     const snap = snapshotRef.current
 
     if (!snap) {
-      navigate("/cart", { replace: true })
+      // Only redirect if there's genuinely no session — not just a slow hydration
+      const hasSession = !!localStorage.getItem("auth_token")
+      if (!hasSession || items.length === 0) {
+        navigate("/cart", { replace: true })
+      }
       return
     }
 
@@ -58,6 +77,9 @@ export function CheckoutPage() {
           discount,
           delivery_fee: delivery,
           total,
+          delivery_address: snap.address ?? undefined,
+          delivery_city: snap.city ?? undefined,
+          delivery_pincode: snap.pincode ?? undefined,
         })
         .then((res) => {
           if (cancelled) return

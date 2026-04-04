@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { profileApi } from "@/services/api"
 import type { ApiProfile } from "@/services/api"
 import { FaUserCircle } from "react-icons/fa"
-import { Mail, Phone, Calendar, LogOut, Package } from "lucide-react"
+import { Mail, Phone, Calendar, LogOut, Package, MapPin } from "lucide-react"
 
 export function ProfilePage() {
   const { user, logout } = useAuth()
@@ -86,6 +86,16 @@ export function ProfilePage() {
                   label="Phone"
                   value={profile.phone_number ?? "Not provided"}
                   muted={!profile.phone_number}
+                />
+                <InfoRow
+                  icon={<MapPin className="h-4 w-4 text-[#AE2534]" />}
+                  label="Address"
+                  value={
+                    profile.address
+                      ? `${profile.address}${profile.city ? ", " + profile.city : ""}${profile.pincode ? " - " + profile.pincode : ""}`
+                      : "No address saved"
+                  }
+                  muted={!profile.address}
                 />
                 {profile.created_at && (
                   <InfoRow

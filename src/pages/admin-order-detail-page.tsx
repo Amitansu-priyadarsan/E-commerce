@@ -15,6 +15,7 @@ import {
   Calendar,
   ShoppingBag,
   CreditCard,
+  MapPin,
 } from "lucide-react"
 
 // ── Status ───────────────────────────────────────────────────────────────────
@@ -220,6 +221,29 @@ export function AdminOrderDetailPage() {
                 )}
               </div>
             </div>
+
+            {/* Delivery Address */}
+            {(order.delivery_address || order.delivery_city || order.delivery_pincode) && (
+              <div className="bg-white rounded-xl border border-slate-200/60 overflow-hidden shadow-sm">
+                <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center">
+                    <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                  </div>
+                  <h2 className="text-sm font-semibold text-slate-900">Delivery Address</h2>
+                </div>
+                <div className="p-5 space-y-4">
+                  {order.delivery_address && (
+                    <Detail icon={<MapPin className="w-3.5 h-3.5" />} label="Address" value={order.delivery_address} />
+                  )}
+                  {order.delivery_city && (
+                    <Detail icon={<MapPin className="w-3.5 h-3.5" />} label="City" value={order.delivery_city} />
+                  )}
+                  {order.delivery_pincode && (
+                    <Detail icon={<MapPin className="w-3.5 h-3.5" />} label="Pincode" value={order.delivery_pincode} />
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Payment */}
             <div className="bg-white rounded-xl border border-slate-200/60 overflow-hidden shadow-sm">

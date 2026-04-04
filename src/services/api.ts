@@ -176,6 +176,9 @@ export const ordersApi = {
     discount: number
     delivery_fee: number
     total: number
+    delivery_address?: string
+    delivery_city?: string
+    delivery_pincode?: string
   }) {
     return api.post<{ order_id: string; status: string }>("/orders/", order)
   },
@@ -196,6 +199,9 @@ export type ApiProfile = {
   email: string
   full_name: string | null
   phone_number: string | null
+  address: string | null
+  city: string | null
+  pincode: string | null
   created_at: string
 }
 
@@ -203,7 +209,7 @@ export const profileApi = {
   getMe() {
     return api.get<ApiProfile>("/users/me")
   },
-  update(data: { full_name?: string; phone_number?: string }) {
+  update(data: { full_name?: string; phone_number?: string; address?: string; city?: string; pincode?: string }) {
     return api.patch<ApiProfile>("/users/me", data)
   },
 }
@@ -243,6 +249,9 @@ export type AdminOrder = {
   delivery_fee: number
   total: number
   created_at: string
+  delivery_address?: string | null
+  delivery_city?: string | null
+  delivery_pincode?: string | null
   users: { email: string; full_name: string | null; phone_number?: string | null } | null
   order_items: Array<{
     id: string

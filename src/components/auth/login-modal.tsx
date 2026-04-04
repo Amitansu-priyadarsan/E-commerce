@@ -1,14 +1,17 @@
 import { X } from "lucide-react"
 import { useState } from "react"
 import { useAuth } from "@/contexts/auth-context"
+import { AddressModal } from "@/components/auth/address-modal"
 
 interface LoginModalProps {
   isOpen: boolean
   onClose: () => void
   authMode?: "signin" | "signup"
+  /** Called after login + address step are fully done */
+  onAuthComplete?: () => void
 }
 
-export function LoginModal({ isOpen, onClose, authMode = "signin" }: LoginModalProps) {
+export function LoginModal({ isOpen, onClose, authMode = "signin", onAuthComplete }: LoginModalProps) {
   const { login, register } = useAuth()
   const [mode, setMode] = useState<"signin" | "signup">(authMode)
   const [email, setEmail] = useState("")
@@ -16,8 +19,9 @@ export function LoginModal({ isOpen, onClose, authMode = "signin" }: LoginModalP
   const [fullName, setFullName] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [showAddress, setShowAddress] = useState(false)
 
-  if (!isOpen) return null
+  if (!isOpen && !showAddress) return null
 
   async function handleSubmit() {
     setError("")
@@ -32,7 +36,10 @@ export function LoginModal({ isOpen, onClose, authMode = "signin" }: LoginModalP
       } else {
         await register(email, password, fullName || undefined)
       }
-      onClose()
+      // After auth succeeds, check if address is missing
+      // We read from the context user — but since state updates are async,
+      // we check via the returned user in context after a tick
+      setShowAddress(true)
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ??
@@ -41,6 +48,30 @@ export function LoginModal({ isOpen, onClose, authMode = "signin" }: LoginModalP
     } finally {
       setLoading(false)
     }
+  }
+
+  function handleAddressDone() {
+    setShowAddress(false)
+    onClose()
+    onAuthComplete?.()
+  }
+
+  function handleAddressSkip() {
+    setShowAddress(false)
+    onClose()
+    onAuthComplete?.()
+  }
+
+  // Show address modal after login
+  if (showAddress) {
+    return (
+      <AddressModal
+        isOpen={true}
+        onClose={handleAddressSkip}
+        onSaved={handleAddressDone}
+        required={false}
+      />
+    )
   }
 
   return (
