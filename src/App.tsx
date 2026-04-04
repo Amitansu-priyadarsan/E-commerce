@@ -11,6 +11,9 @@ import { ContactUsPage } from "@/pages/contact-us-page"
 import { OrdersPage } from "@/pages/orders-page"
 import { CheckoutPage } from "@/pages/checkout-page"
 import { OrderConfirmationPage } from "@/pages/order-confirmation-page"
+import { AdminLoginPage } from "@/pages/admin-login-page"
+import { AdminDashboardPage } from "@/pages/admin-dashboard-page"
+import { AdminOrderDetailPage } from "@/pages/admin-order-detail-page"
 import PageLoader from "@/components/layout/page-loader"
 
 function ScrollToTopOnRouteChange() {
@@ -30,8 +33,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Skip loader for category, checkout, and order-confirmation pages
-    if (pathname.startsWith("/category") || pathname.startsWith("/checkout") || pathname.startsWith("/order-confirmation")) {
+    // Skip loader for admin, category, checkout, and order-confirmation pages
+    if (pathname.startsWith("/admin") || pathname.startsWith("/category") || pathname.startsWith("/checkout") || pathname.startsWith("/order-confirmation")) {
       setIsLoading(false)
       return
     }
@@ -43,6 +46,18 @@ function App() {
 
     return () => clearTimeout(timer)
   }, [pathname])
+
+  // Admin pages render without the main Layout
+  if (pathname.startsWith("/admin")) {
+    return (
+      <Routes>
+        <Route path="/admin" element={<AdminLoginPage />} />
+        <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+        <Route path="/admin/orders/:orderId" element={<AdminOrderDetailPage />} />
+        <Route path="*" element={<Navigate to="/admin" replace />} />
+      </Routes>
+    )
+  }
 
   return (
     <Layout>

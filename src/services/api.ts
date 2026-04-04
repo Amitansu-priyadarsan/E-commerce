@@ -153,7 +153,7 @@ export type ApiOrderItem = {
 export type ApiOrder = {
   id: string
   user_id: string
-  status: "pending" | "confirmed" | "out_for_delivery" | "delivered"
+  status: "pending" | "processing" | "shipped" | "delivered"
   subtotal: number
   discount: number
   delivery_fee: number
@@ -213,6 +213,72 @@ export const profileApi = {
 export const contactApi = {
   send(message: { name: string; email: string; message: string }) {
     return api.post<{ detail: string; id: string }>("/contact/", message)
+  },
+}
+
+// ── Admin ────────────────────────────────────────────────────────────────────
+
+export type AdminDashboard = {
+  total_orders: number
+  total_revenue: number
+  total_users: number
+  total_products: number
+  status_counts: Record<string, number>
+  recent_orders: Array<{
+    id: string
+    user_id: string
+    status: string
+    total: number
+    created_at: string
+    users: { email: string; full_name: string | null } | null
+  }>
+}
+
+export type AdminOrder = {
+  id: string
+  user_id: string
+  status: "pending" | "processing" | "shipped" | "delivered"
+  subtotal: number
+  discount: number
+  delivery_fee: number
+  total: number
+  created_at: string
+  users: { email: string; full_name: string | null; phone_number?: string | null } | null
+  order_items: Array<{
+    id: string
+    product_id: string
+    quantity: number
+    selected_color?: string
+    selected_size?: string
+    price_at_purchase: number
+    products?: { name: string; image_url: string; category?: string }
+  }>
+}
+
+function adminHeaders() {
+  const token = localStorage.getItem("admin_token")
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+export const adminApi = {
+  login(email: string, password: string) {
+    return api.post<{ access_token: string; role: string }>("/admin/login", { email, password })
+  },
+
+  getDashboard() {
+    return api.get<AdminDashboard>("/admin/dashboard", { headers: adminHeaders() })
+  },
+
+  getAllOrders() {
+    return api.get<AdminOrder[]>("/admin/orders", { headers: adminHeaders() })
+  },
+
+  getOrder(orderId: string) {
+    return api.get<AdminOrder>(`/admin/orders/${orderId}`, { headers: adminHeaders() })
+  },
+
+  updateOrderStatus(orderId: string, status: string) {
+    return api.patch<AdminOrder>(`/admin/orders/${orderId}/status`, { status }, { headers: adminHeaders() })
   },
 }
 
