@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useParams, useLocation } from "react-router-dom"
-import { Check, Settings2, ChevronDown } from "lucide-react"
+import { Check, Settings2, ChevronDown, Heart } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { products, type Product } from "@/data/products"
 import { Card } from "@/components/ui/card"
@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { useCart } from "@/contexts/cart-context"
 import { useToast } from "@/contexts/toast-context"
+import { useWishlist } from "@/contexts/wishlist-context"
 import { ReviewCard } from "@/components/common/review-card"
+import { LoginModal } from "@/components/auth/login-modal"
 
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -18,6 +20,8 @@ export function ProductDetailPage() {
   const product = stateProduct || products.find((p) => p.id === id)
   const { addItem } = useCart()
   const { showToast } = useToast()
+  const { toggle: toggleWishlist, isInWishlist } = useWishlist()
+  const [showLoginModal, setShowLoginModal] = useState(false)
   const [color, setColor] = useState<string | undefined>(product?.colors[0])
   const [size, setSize] = useState<string | undefined>(product?.sizes[0])
   const [quantity, setQuantity] = useState(1)
@@ -105,7 +109,10 @@ export function ProductDetailPage() {
           quantity={quantity}
           onQuantityChange={setQuantity}
           onAddToCart={handleAddToCart}
+          inWishlist={isInWishlist(product.id)}
+          onToggleWishlist={() => toggleWishlist(product.id, () => setShowLoginModal(true))}
         />
+        <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} authMode="signin" />
       </section>
 
       <section className="space-y-6 pt-10">
@@ -311,6 +318,8 @@ type ProductInfoProps = {
   quantity: number
   onQuantityChange: (value: number) => void
   onAddToCart: () => void
+  inWishlist: boolean
+  onToggleWishlist: () => void
 }
 
 function ProductInfo({
@@ -328,6 +337,8 @@ function ProductInfo({
   quantity,
   onQuantityChange,
   onAddToCart,
+  inWishlist,
+  onToggleWishlist,
 }: ProductInfoProps) {
   return (
     <div className="space-y-6">
@@ -413,6 +424,18 @@ function ProductInfo({
           >
             Add to Cart
           </Button>
+          <button
+            type="button"
+            onClick={onToggleWishlist}
+            className={`h-14 w-14 shrink-0 rounded-full border-2 flex items-center justify-center transition-colors ${
+              inWishlist
+                ? "border-red-500 bg-red-50 text-red-500"
+                : "border-zinc-200 bg-white text-zinc-400 hover:border-red-400 hover:text-red-400"
+            }`}
+            aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+          >
+            <Heart className={`h-5 w-5 ${inWishlist ? "fill-red-500" : ""}`} />
+          </button>
         </div>
       </div>
     </div>

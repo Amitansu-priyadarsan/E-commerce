@@ -10,6 +10,7 @@ import { PriceSlider } from "@/components/ui/slider"
 import { Select } from "@/components/ui/select"
 import { Pagination } from "@/components/ui/pagination"
 import { Star } from "lucide-react"
+import { LoginModal } from "@/components/auth/login-modal"
 
 const COLORS = [
   { hex: "#8B0000", label: "Deep Red" },
@@ -46,7 +47,8 @@ export function CategoryPage() {
   const { slug } = useParams<{ slug: string }>()
   const { addItem } = useCart()
   const { showToast } = useToast()
-  const { toggleWishlist, isInWishlist } = useWishlist()
+  const { toggle: toggleWishlist, isInWishlist } = useWishlist()
+  const [showLoginModal, setShowLoginModal] = useState(false)
 
   // Use local selectedCategory state, initialized from URL slug
   const [selectedCategory, setSelectedCategory] = useState<string>(slug || "all")
@@ -455,7 +457,7 @@ export function CategoryPage() {
                             onClick={(e) => {
                               e.preventDefault()
                               e.stopPropagation()
-                              toggleWishlist(product.id)
+                              toggleWishlist(product.id, () => setShowLoginModal(true))
                             }}
                             className={`absolute right-3 top-3 rounded-full p-2 backdrop-blur-sm transition-all duration-200 hover:scale-110 ${isInWishlist(product.id)
                               ? "bg-red-50 opacity-100"
@@ -563,6 +565,7 @@ export function CategoryPage() {
           </div>
         </div>
       </div>
+      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} authMode="signin" />
     </div>
   )
 }

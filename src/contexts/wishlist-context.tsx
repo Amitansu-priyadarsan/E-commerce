@@ -1,47 +1,106 @@
-import React, { createContext, useContext, useState, useEffect } from "react"
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react"
+import { wishlistApi } from "@/services/api"
+import { useAuth } from "@/contexts/auth-context"
+
+interface WishlistProduct {
+  id: string
+  name: string
+  price: number
+  original_price?: number
+  image_url: string
+  rating: number
+  category: string
+}
+
+interface WishlistItem {
+  id: string
+  product_id: string
+  products: WishlistProduct
+}
 
 interface WishlistContextType {
-    wishlist: string[]
-    toggleWishlist: (productId: string) => void
-    isInWishlist: (productId: string) => boolean
+  items: WishlistItem[]
+  wishlistIds: Set<string>
+  loading: boolean
+  /** Toggle a product. If not logged in, calls onLoginRequired instead. */
+  toggle: (productId: string, onLoginRequired?: () => void) => Promise<void>
+  isInWishlist: (productId: string) => boolean
+  clearLocal: () => void
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined)
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
-    const [wishlist, setWishlist] = useState<string[]>(() => {
-        if (typeof window !== "undefined") {
-            const saved = localStorage.getItem("wishlist")
-            return saved ? JSON.parse(saved) : []
-        }
-        return []
-    })
+  const { user } = useAuth()
+  const [items, setItems] = useState<WishlistItem[]>([])
+  const [loading, setLoading] = useState(false)
 
-    useEffect(() => {
-        localStorage.setItem("wishlist", JSON.stringify(wishlist))
-    }, [wishlist])
+  const wishlistIds = new Set(items.map((i) => i.product_id))
 
-    const toggleWishlist = (productId: string) => {
-        setWishlist((prev) =>
-            prev.includes(productId)
-                ? prev.filter((id) => id !== productId)
-                : [...prev, productId]
-        )
+  // Fetch from API whenever user logs in
+  useEffect(() => {
+    if (!user) {
+      setItems([])
+      return
     }
+    setLoading(true)
+    wishlistApi
+      .get(user.user_id)
+      .then((res) => setItems(res.data as WishlistItem[]))
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false))
+  }, [user?.user_id])
 
-    const isInWishlist = (productId: string) => wishlist.includes(productId)
+  const toggle = useCallback(
+    async (productId: string, onLoginRequired?: () => void) => {
+      if (!user) {
+        onLoginRequired?.()
+        return
+      }
+      const alreadyIn = wishlistIds.has(productId)
+      // Optimistic update
+      if (alreadyIn) {
+        setItems((prev) => prev.filter((i) => i.product_id !== productId))
+        try {
+          await wishlistApi.remove(user.user_id, productId)
+        } catch {
+          // revert on failure — re-fetch
+          wishlistApi.get(user.user_id).then((res) => setItems(res.data as WishlistItem[]))
+        }
+      } else {
+        try {
+          await wishlistApi.add(user.user_id, productId)
+          // Re-fetch to get full product data
+          const res = await wishlistApi.get(user.user_id)
+          setItems(res.data as WishlistItem[])
+        } catch {
+          /* ignore */
+        }
+      }
+    },
+    [user, wishlistIds]
+  )
 
-    return (
-        <WishlistContext.Provider value={{ wishlist, toggleWishlist, isInWishlist }}>
-            {children}
-        </WishlistContext.Provider>
-    )
+  const isInWishlist = useCallback(
+    (productId: string) => wishlistIds.has(productId),
+    [wishlistIds]
+  )
+
+  function clearLocal() {
+    setItems([])
+  }
+
+  return (
+    <WishlistContext.Provider value={{ items, wishlistIds, loading, toggle, isInWishlist, clearLocal }}>
+      {children}
+    </WishlistContext.Provider>
+  )
 }
 
 export function useWishlist() {
-    const context = useContext(WishlistContext)
-    if (context === undefined) {
-        throw new Error("useWishlist must be used within a WishlistProvider")
-    }
-    return context
+  const context = useContext(WishlistContext)
+  if (context === undefined) {
+    throw new Error("useWishlist must be used within a WishlistProvider")
+  }
+  return context
 }

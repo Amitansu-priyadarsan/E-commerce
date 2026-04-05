@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button"
 import { useCart } from "@/contexts/cart-context"
 import { useToast } from "@/contexts/toast-context"
 import { useNavigate } from "react-router-dom"
+import { useState } from "react"
+import { useWishlist } from "@/contexts/wishlist-context"
+import { LoginModal } from "@/components/auth/login-modal"
 
 import CarnivalBanner from "@/assets/Hero/Carnival.png"
 import LehengaImg from "@/assets/Hero/Lehenga.png"
@@ -49,6 +52,8 @@ export function CarnivalSection() {
     const { addItem } = useCart()
     const { showToast } = useToast()
     const navigate = useNavigate()
+    const { toggle: toggleWishlist, isInWishlist } = useWishlist()
+    const [showLoginModal, setShowLoginModal] = useState(false)
 
     const handleAddToCart = (product: typeof mockProducts[0]) => {
         addItem({
@@ -67,6 +72,7 @@ export function CarnivalSection() {
     }
 
     return (
+        <>
         <section className="mt-16 w-full flex flex-col items-center">
             {/* Carnival Banner */}
             <div className="w-full max-w-[1440px] px-4 md:px-8">
@@ -92,8 +98,14 @@ export function CarnivalSection() {
                                 />
 
                                 {/* Heart Icon */}
-                                <button className="absolute top-4 right-4 text-white hover:text-red-500 transition-colors">
-                                    <Heart className="h-6 w-6" />
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        toggleWishlist(product.id, () => setShowLoginModal(true))
+                                    }}
+                                    className="absolute top-4 right-4 transition-colors"
+                                >
+                                    <Heart className={`h-6 w-6 transition-colors ${isInWishlist(product.id) ? "fill-red-500 text-red-500" : "text-white hover:text-red-400"}`} />
                                 </button>
 
                                 {/* Buttons overlay (Always visible now) */}
@@ -141,5 +153,7 @@ export function CarnivalSection() {
                 </div>
             </div>
         </section>
+        <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} authMode="signin" />
+        </>
     )
 }
